@@ -1,44 +1,39 @@
 <!-- Code generated from the comments of the cpuFlagsConfig struct in builder/proxmox/common/config.go; DO NOT EDIT MANUALLY -->
 
-- `aes` (string) - Activate AES instruction set for HW acceleration.
-  Can be `"on"`, `"off"`, or unset.
+- `aes` (\*bool) - Activate AES instruction set for HW acceleration.
+  Can be `true`, `false`, or unset.
 
-- `amd_no_ssb` (string) - Notifies guest OS that host is not vulnerable for Spectre on AMD CPUs.
-  Can be `"on"`, `"off"`, or unset.
+- `amd_no_ssb` (\*bool) - Notifies guest OS that host is not vulnerable for Spectre on AMD CPUs.
+  Can be `true`, `false`, or unset.
 
-- `amd_ssbd` (string) - Improves Spectre mitigation performance with AMD CPUs, best used with `virt_ssbd`.
-  Can be `"on"`, `"off"`, or unset.
+- `amd_ssbd` (\*bool) - Improves Spectre mitigation performance with AMD CPUs, best used with `virt_ssbd`.
+  Can be `true`, `false`, or unset.
 
-- `hv_evmcs` (string) - Improve performance for nested virtualization. Only supported on Intel CPUs.
-  Can be `"on"`, `"off"`, or unset.
+- `hv_evmcs` (\*bool) - Improve performance for nested virtualization. Only supported on Intel CPUs.
+  Can be `true`, `false`, or unset.
 
-- `hv_tlb_flush` (string) - Improve performance in overcommitted Windows guests. May lead to guest bluescreens on old CPUs.
-  Can be `"on"`, `"off"`, or unset.
+- `hv_tlb_flush` (\*bool) - Improve performance in overcommitted Windows guests. May lead to guest bluescreens on old CPUs.
+  Can be `true`, `false`, or unset.
 
-- `ibpb` (string) - Allows improved Spectre mitigation with AMD CPUs.
-  Can be `"on"`, `"off"`, or unset.
+- `ibpb` (\*bool) - Allows improved Spectre mitigation with AMD CPUs.
+  Can be `true`, `false`, or unset.
 
-- `md_clear` (string) - Required to let the guest OS know if MDS is mitigated correctly.
-  Can be `"on"`, `"off"`, or unset.
+- `md_clear` (\*bool) - Required to let the guest OS know if MDS is mitigated correctly.
+  Can be `true`, `false`, or unset.
 
-- `pcid` (string) - Meltdown fix cost reduction on Westmere, Sandy-, and IvyBridge Intel CPUs.
-  Can be `"on"`, `"off"`, or unset.
+- `pcid` (\*bool) - Meltdown fix cost reduction on Westmere, Sandy-, and IvyBridge Intel CPUs.
+  Can be `true`, `false`, or unset.
 
-- `pdpe1gb` (string) - Allow guest OS to use 1GB size pages, if host HW supports it.
-  Can be `"on"`, `"off"`, or unset.
+- `pdpe1gb` (\*bool) - Allow guest OS to use 1GB size pages, if host HW supports it.
+  Can be `true`, `false`, or unset.
 
-- `ssbd` (string) - Protection for "Speculative Store Bypass" for Intel models.
-  Can be `"on"`, `"off"`, or unset.
+- `ssbd` (\*bool) - Protection for "Speculative Store Bypass" for Intel models.
+  Can be `true`, `false`, or unset.
 
-- `spec_ctrl` (string) - Allows improved Spectre mitigation with Intel CPUs.
-  Can be `"on"`, `"off"`, or unset.
+- `spec_ctrl` (\*bool) - Allows improved Spectre mitigation with Intel CPUs.
+  Can be `true`, `false`, or unset.
 
-- `virt_ssbd` (string) - Basis for "Speculative Store Bypass" protection for AMD models.
-  Can be `"on"`, `"off"`, or unset.
-
-- `nested_virt` (string) - Enable nested virtualization. Allows the guest VM to run hypervisors itself.
-  Requires nested KVM support to be enabled on the Proxmox host (e.g.,
-  `options kvm-intel nested=1` in `/etc/modprobe.d/kvm-intel.conf`).
-  Can be `"on"`, `"off"`, or unset.
+- `virt_ssbd` (\*bool) - Basis for "Speculative Store Bypass" protection for AMD models.
+  Can be `true`, `false`, or unset.
 
 <!-- End of code generated from the comments of the cpuFlagsConfig struct in builder/proxmox/common/config.go; -->

@@ -234,19 +234,6 @@ func (s *stepStartVM) Run(ctx context.Context, state multistep.StateBag) multist
 		}
 	}
 
-	// The nested-virt CPU flag is not supported by the proxmox-api-go library's
-	// CpuFlags struct, so we set the full CPU string via a separate API call.
-	if c.CPUFlags.NestedVirt != "" {
-		cpuString := buildCPUString(c.CPUType, c.CPUFlags)
-		_, err := client.SetVmConfig(vmRef, map[string]interface{}{"cpu": cpuString})
-		if err != nil {
-			err := fmt.Errorf("error setting CPU flags (nested-virt): %s", err)
-			state.Put("error", err)
-			ui.Error(err.Error())
-			return multistep.ActionHalt
-		}
-	}
-
 	// Store the vm id for later
 	state.Put("vmRef", vmRef)
 	// instance_id is the generic term used so that users can have access to the
@@ -793,17 +780,16 @@ func generateProxmoxTpm(tpm tpmConfig) *proxmox.TpmState {
 	return &dev
 }
 
-func cpuFlagToTriBool(flag string) *proxmox.TriBool {
-	switch flag {
-	case "on":
-		v := proxmox.TriBoolTrue
-		return &v
-	case "off":
-		v := proxmox.TriBoolFalse
-		return &v
-	default:
+func cpuFlagToTriBool(flag *bool) *proxmox.TriBool {
+	if flag == nil {
 		return nil
 	}
+	if *flag {
+		v := proxmox.TriBoolTrue
+		return &v
+	}
+	v := proxmox.TriBoolFalse
+	return &v
 }
 
 func generateProxmoxCPUFlags(flags cpuFlagsConfig) *proxmox.CpuFlags {
@@ -824,47 +810,6 @@ func generateProxmoxCPUFlags(flags cpuFlagsConfig) *proxmox.CpuFlags {
 		SpecCtrl:   cpuFlagToTriBool(flags.SpecCtrl),
 		VirtSSBD:   cpuFlagToTriBool(flags.VirtSSBD),
 	}
-}
-
-// buildCPUString constructs the Proxmox API cpu parameter string including all
-// configured CPU flags. This is needed for flags not supported by the
-// proxmox-api-go CpuFlags struct (e.g. nested-virt).
-// The returned string has the form: "<cpuType>[,flags=<+/-flag>[;<+/-flag>...]]"
-func buildCPUString(cpuType string, flags cpuFlagsConfig) string {
-	type flagEntry struct {
-		value string
-		name  string
-	}
-	allFlags := []flagEntry{
-		{flags.AES, "aes"},
-		{flags.AmdNoSSB, "amd-no-ssb"},
-		{flags.AmdSSBD, "amd-ssbd"},
-		{flags.HvEvmcs, "hv-evmcs"},
-		{flags.HvTlbFlush, "hv-tlbflush"},
-		{flags.Ibpb, "ibpb"},
-		{flags.MdClear, "md-clear"},
-		{flags.PCID, "pcid"},
-		{flags.Pdpe1GB, "pdpe1gb"},
-		{flags.SSBD, "ssbd"},
-		{flags.SpecCtrl, "spec-ctrl"},
-		{flags.VirtSSBD, "virt-ssbd"},
-		{flags.NestedVirt, "nested-virt"},
-	}
-
-	var parts []string
-	for _, f := range allFlags {
-		switch f.value {
-		case "on":
-			parts = append(parts, "+"+f.name)
-		case "off":
-			parts = append(parts, "-"+f.name)
-		}
-	}
-
-	if len(parts) == 0 {
-		return cpuType
-	}
-	return cpuType + ",flags=" + strings.Join(parts, ";")
 }
 
 func setDeviceParamIfDefined(dev proxmox.QemuDevice, key, value string) {
