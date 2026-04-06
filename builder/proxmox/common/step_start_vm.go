@@ -234,6 +234,35 @@ func (s *stepStartVM) Run(ctx context.Context, state multistep.StateBag) multist
 		}
 	}
 
+	// nested-virt is not supported by the proxmox-api-go CpuFlags struct, so it
+	// must be applied via a direct CPU parameter update after VM creation.
+	if c.CPUFlags.NestedVirt != nil {
+		nestedVirtFlag := "-nested-virt"
+		if *c.CPUFlags.NestedVirt {
+			nestedVirtFlag = "+nested-virt"
+		}
+		currentCPU, err := client.GetVmConfig(vmRef)
+		if err != nil {
+			err := fmt.Errorf("error getting VM config for nested-virt: %s", err)
+			state.Put("error", err)
+			ui.Error(err.Error())
+			return multistep.ActionHalt
+		}
+		cpuParam, ok := currentCPU["cpu"].(string)
+		if !ok || cpuParam == "" {
+			// Fall back to the configured CPU type if the API response is missing the field.
+			cpuParam = c.CPUType
+		}
+		cpuParam = nestedVirtCPUParam(cpuParam, nestedVirtFlag)
+		_, err = client.SetVmConfig(vmRef, map[string]interface{}{"cpu": cpuParam})
+		if err != nil {
+			err := fmt.Errorf("error setting nested-virt CPU flag: %s", err)
+			state.Put("error", err)
+			ui.Error(err.Error())
+			return multistep.ActionHalt
+		}
+	}
+
 	// Store the vm id for later
 	state.Put("vmRef", vmRef)
 	// instance_id is the generic term used so that users can have access to the
@@ -793,7 +822,12 @@ func cpuFlagToTriBool(flag *bool) *proxmox.TriBool {
 }
 
 func generateProxmoxCPUFlags(flags cpuFlagsConfig) *proxmox.CpuFlags {
-	if flags == (cpuFlagsConfig{}) {
+	// NestedVirt is handled separately (not part of the Telmate CpuFlags struct).
+	// Check only the flags that are actually forwarded to the library.
+	if flags.AES == nil && flags.AmdNoSSB == nil && flags.AmdSSBD == nil &&
+		flags.HvEvmcs == nil && flags.HvTlbFlush == nil && flags.Ibpb == nil &&
+		flags.MdClear == nil && flags.PCID == nil && flags.Pdpe1GB == nil &&
+		flags.SSBD == nil && flags.SpecCtrl == nil && flags.VirtSSBD == nil {
 		return nil
 	}
 	return &proxmox.CpuFlags{
@@ -810,6 +844,36 @@ func generateProxmoxCPUFlags(flags cpuFlagsConfig) *proxmox.CpuFlags {
 		SpecCtrl:   cpuFlagToTriBool(flags.SpecCtrl),
 		VirtSSBD:   cpuFlagToTriBool(flags.VirtSSBD),
 	}
+}
+
+// nestedVirtCPUParam updates the Proxmox CPU parameter string to add or replace
+// the nested-virt flag. The flag argument must be "+nested-virt" or "-nested-virt".
+// If the cpu string already contains a flags section the nested-virt entry is
+// replaced; otherwise a new flags section is appended.
+func nestedVirtCPUParam(cpu, flag string) string {
+	const flagsPrefix = ",flags="
+	const nestedFlag = "nested-virt"
+
+	flagsIdx := strings.Index(cpu, flagsPrefix)
+	if flagsIdx == -1 {
+		return cpu + flagsPrefix + flag
+	}
+
+	// Parse existing flags and replace/add nested-virt.
+	cpuType := cpu[:flagsIdx]
+	existingFlags := strings.Split(cpu[flagsIdx+len(flagsPrefix):], ";")
+	replaced := false
+	for i, f := range existingFlags {
+		if len(f) == len(nestedFlag)+1 && f[1:] == nestedFlag {
+			existingFlags[i] = flag
+			replaced = true
+			break
+		}
+	}
+	if !replaced {
+		existingFlags = append(existingFlags, flag)
+	}
+	return cpuType + flagsPrefix + strings.Join(existingFlags, ";")
 }
 
 func setDeviceParamIfDefined(dev proxmox.QemuDevice, key, value string) {

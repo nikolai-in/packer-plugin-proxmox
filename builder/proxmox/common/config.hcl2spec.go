@@ -353,6 +353,7 @@ type FlatcpuFlagsConfig struct {
 	SSBD       *bool `mapstructure:"ssbd" cty:"ssbd" hcl:"ssbd"`
 	SpecCtrl   *bool `mapstructure:"spec_ctrl" cty:"spec_ctrl" hcl:"spec_ctrl"`
 	VirtSSBD   *bool `mapstructure:"virt_ssbd" cty:"virt_ssbd" hcl:"virt_ssbd"`
+	NestedVirt *bool `mapstructure:"nested_virt" cty:"nested_virt" hcl:"nested_virt"`
 }
 
 // FlatMapstructure returns a new FlatcpuFlagsConfig.
@@ -379,6 +380,7 @@ func (*FlatcpuFlagsConfig) HCL2Spec() map[string]hcldec.Spec {
 		"ssbd":         &hcldec.AttrSpec{Name: "ssbd", Type: cty.Bool, Required: false},
 		"spec_ctrl":    &hcldec.AttrSpec{Name: "spec_ctrl", Type: cty.Bool, Required: false},
 		"virt_ssbd":    &hcldec.AttrSpec{Name: "virt_ssbd", Type: cty.Bool, Required: false},
+		"nested_virt":  &hcldec.AttrSpec{Name: "nested_virt", Type: cty.Bool, Required: false},
 	}
 	return s
 }

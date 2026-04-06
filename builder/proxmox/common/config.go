@@ -556,6 +556,11 @@ type cpuFlagsConfig struct {
 	// Basis for "Speculative Store Bypass" protection for AMD models.
 	// Can be `true`, `false`, or unset.
 	VirtSSBD *bool `mapstructure:"virt_ssbd"`
+	// Enable nested virtualization. Allows the guest VM to run hypervisors itself.
+	// Requires nested KVM support to be enabled on the Proxmox host (e.g.,
+	// `options kvm-intel nested=1` in `/etc/modprobe.d/kvm-intel.conf`).
+	// Can be `true`, `false`, or unset.
+	NestedVirt *bool `mapstructure:"nested_virt"`
 }
 
 // - `vga` (object) - The graphics adapter to use. Example:

@@ -1392,11 +1392,64 @@ func TestGenerateProxmoxCPUFlags(t *testing.T) {
 				Pdpe1GB:  triBoolPtr(proxmox.TriBoolTrue),
 			},
 		},
+		{
+			// NestedVirt is handled separately; it must not block the nil-check for other flags
+			name:     "only nested_virt set returns nil CpuFlags (handled separately)",
+			input:    cpuFlagsConfig{NestedVirt: boolPtr(true)},
+			expected: nil,
+		},
 	}
 
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
 			result := generateProxmoxCPUFlags(tc.input)
+			assert.Equal(t, tc.expected, result)
+		})
+	}
+}
+
+func TestNestedVirtCPUParam(t *testing.T) {
+	testCases := []struct {
+		name     string
+		cpu      string
+		flag     string
+		expected string
+	}{
+		{
+			name:     "no flags section - enable",
+			cpu:      "kvm64",
+			flag:     "+nested-virt",
+			expected: "kvm64,flags=+nested-virt",
+		},
+		{
+			name:     "no flags section - disable",
+			cpu:      "host",
+			flag:     "-nested-virt",
+			expected: "host,flags=-nested-virt",
+		},
+		{
+			name:     "existing flags section - append",
+			cpu:      "kvm64,flags=+aes",
+			flag:     "+nested-virt",
+			expected: "kvm64,flags=+aes;+nested-virt",
+		},
+		{
+			name:     "replace existing nested-virt enable with disable",
+			cpu:      "kvm64,flags=+aes;+nested-virt;+pcid",
+			flag:     "-nested-virt",
+			expected: "kvm64,flags=+aes;-nested-virt;+pcid",
+		},
+		{
+			name:     "replace existing nested-virt disable with enable",
+			cpu:      "kvm64,flags=-nested-virt",
+			flag:     "+nested-virt",
+			expected: "kvm64,flags=+nested-virt",
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			result := nestedVirtCPUParam(tc.cpu, tc.flag)
 			assert.Equal(t, tc.expected, result)
 		})
 	}
