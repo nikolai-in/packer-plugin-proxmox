@@ -33,6 +33,7 @@
         }:
         {
           devShells.default = pkgs.mkShell {
+            packages = config.pre-commit.settings.enabledPackages;
             buildInputs = with pkgs; [
               # Git & Version Control
               git
