@@ -1309,3 +1309,95 @@ func TestGenerateProxmoxDisks(t *testing.T) {
 		})
 	}
 }
+
+func boolPtr(b bool) *bool {
+	return &b
+}
+
+func triBoolPtr(v proxmox.TriBool) *proxmox.TriBool {
+	return &v
+}
+
+func TestCpuFlagToTriBool(t *testing.T) {
+	testCases := []struct {
+		name     string
+		input    *bool
+		expected *proxmox.TriBool
+	}{
+		{
+			name:     "nil returns nil",
+			input:    nil,
+			expected: nil,
+		},
+		{
+			name:     "true returns TriBoolTrue",
+			input:    boolPtr(true),
+			expected: triBoolPtr(proxmox.TriBoolTrue),
+		},
+		{
+			name:     "false returns TriBoolFalse",
+			input:    boolPtr(false),
+			expected: triBoolPtr(proxmox.TriBoolFalse),
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			result := cpuFlagToTriBool(tc.input)
+			if tc.expected == nil {
+				assert.Nil(t, result)
+			} else {
+				assert.NotNil(t, result)
+				assert.Equal(t, *tc.expected, *result)
+			}
+		})
+	}
+}
+
+func TestGenerateProxmoxCPUFlags(t *testing.T) {
+	testCases := []struct {
+		name     string
+		input    cpuFlagsConfig
+		expected *proxmox.CpuFlags
+	}{
+		{
+			name:     "empty config returns nil",
+			input:    cpuFlagsConfig{},
+			expected: nil,
+		},
+		{
+			name:  "AES true",
+			input: cpuFlagsConfig{AES: boolPtr(true)},
+			expected: &proxmox.CpuFlags{
+				AES: triBoolPtr(proxmox.TriBoolTrue),
+			},
+		},
+		{
+			name:  "AES false",
+			input: cpuFlagsConfig{AES: boolPtr(false)},
+			expected: &proxmox.CpuFlags{
+				AES: triBoolPtr(proxmox.TriBoolFalse),
+			},
+		},
+		{
+			name: "multiple flags",
+			input: cpuFlagsConfig{
+				AES:      boolPtr(true),
+				SpecCtrl: boolPtr(false),
+				Pdpe1GB:  boolPtr(true),
+			},
+			expected: &proxmox.CpuFlags{
+				AES:      triBoolPtr(proxmox.TriBoolTrue),
+				SpecCtrl: triBoolPtr(proxmox.TriBoolFalse),
+				Pdpe1GB:  triBoolPtr(proxmox.TriBoolTrue),
+			},
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			result := generateProxmoxCPUFlags(tc.input)
+			assert.Equal(t, tc.expected, result)
+		})
+	}
+}

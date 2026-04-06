@@ -494,7 +494,7 @@ type rng0Config struct {
 }
 
 // - `cpu_flags` (object) - Set additional CPU flags to enable or disable specific CPU features.
-// Each flag can be set to `true` (force enable), `false` (force disable), or left unset (empty string, use default).
+// Each flag can be set to `true` (force enable), `false` (force disable), or left unset (use default).
 //
 // HCL2 example:
 //
