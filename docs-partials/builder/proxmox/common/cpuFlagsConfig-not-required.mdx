@@ -36,4 +36,9 @@
 - `virt_ssbd` (string) - Basis for "Speculative Store Bypass" protection for AMD models.
   Can be `"on"`, `"off"`, or unset.
 
+- `nested_virt` (string) - Enable nested virtualization. Allows the guest VM to run hypervisors itself.
+  Requires nested KVM support to be enabled on the Proxmox host (e.g.,
+  `options kvm-intel nested=1` in `/etc/modprobe.d/kvm-intel.conf`).
+  Can be `"on"`, `"off"`, or unset.
+
 <!-- End of code generated from the comments of the cpuFlagsConfig struct in builder/proxmox/common/config.go; -->

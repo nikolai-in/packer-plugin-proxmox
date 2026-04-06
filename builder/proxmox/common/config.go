@@ -501,9 +501,10 @@ type rng0Config struct {
 // ```hcl
 //
 //	cpu_flags {
-//	  aes        = "on"
-//	  pdpe1gb    = "off"
-//	  spec_ctrl  = "on"
+//	  aes          = "on"
+//	  pdpe1gb      = "off"
+//	  spec_ctrl    = "on"
+//	  nested_virt  = "on"
 //	}
 //
 // ```
@@ -515,7 +516,8 @@ type rng0Config struct {
 //	"cpu_flags": {
 //	  "aes": "on",
 //	  "pdpe1gb": "off",
-//	  "spec_ctrl": "on"
+//	  "spec_ctrl": "on",
+//	  "nested_virt": "on"
 //	}
 //
 // ```
@@ -556,6 +558,11 @@ type cpuFlagsConfig struct {
 	// Basis for "Speculative Store Bypass" protection for AMD models.
 	// Can be `"on"`, `"off"`, or unset.
 	VirtSSBD string `mapstructure:"virt_ssbd"`
+	// Enable nested virtualization. Allows the guest VM to run hypervisors itself.
+	// Requires nested KVM support to be enabled on the Proxmox host (e.g.,
+	// `options kvm-intel nested=1` in `/etc/modprobe.d/kvm-intel.conf`).
+	// Can be `"on"`, `"off"`, or unset.
+	NestedVirt string `mapstructure:"nested_virt"`
 }
 
 // - `vga` (object) - The graphics adapter to use. Example:
@@ -739,18 +746,19 @@ func (c *Config) Prepare(upper interface{}, raws ...interface{}) ([]string, []st
 		c.CPUType = "kvm64"
 	}
 	for flagName, flagValue := range map[string]string{
-		"aes":         c.CPUFlags.AES,
-		"amd_no_ssb":  c.CPUFlags.AmdNoSSB,
-		"amd_ssbd":    c.CPUFlags.AmdSSBD,
-		"hv_evmcs":    c.CPUFlags.HvEvmcs,
+		"aes":          c.CPUFlags.AES,
+		"amd_no_ssb":   c.CPUFlags.AmdNoSSB,
+		"amd_ssbd":     c.CPUFlags.AmdSSBD,
+		"hv_evmcs":     c.CPUFlags.HvEvmcs,
 		"hv_tlb_flush": c.CPUFlags.HvTlbFlush,
-		"ibpb":        c.CPUFlags.Ibpb,
-		"md_clear":    c.CPUFlags.MdClear,
-		"pcid":        c.CPUFlags.PCID,
-		"pdpe1gb":     c.CPUFlags.Pdpe1GB,
-		"ssbd":        c.CPUFlags.SSBD,
-		"spec_ctrl":   c.CPUFlags.SpecCtrl,
-		"virt_ssbd":   c.CPUFlags.VirtSSBD,
+		"ibpb":         c.CPUFlags.Ibpb,
+		"md_clear":     c.CPUFlags.MdClear,
+		"pcid":         c.CPUFlags.PCID,
+		"pdpe1gb":      c.CPUFlags.Pdpe1GB,
+		"ssbd":         c.CPUFlags.SSBD,
+		"spec_ctrl":    c.CPUFlags.SpecCtrl,
+		"virt_ssbd":    c.CPUFlags.VirtSSBD,
+		"nested_virt":  c.CPUFlags.NestedVirt,
 	} {
 		if flagValue != "" && flagValue != "on" && flagValue != "off" {
 			errs = packersdk.MultiErrorAppend(errs, fmt.Errorf("cpu_flags.%s must be 'on', 'off', or empty string, got %q", flagName, flagValue))

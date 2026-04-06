@@ -1398,3 +1398,56 @@ assert.Equal(t, tc.expected.VirtSSBD, result.VirtSSBD)
 })
 }
 }
+
+func TestBuildCPUString(t *testing.T) {
+testCases := []struct {
+name     string
+cpuType  string
+flags    cpuFlagsConfig
+expected string
+}{
+{
+name:     "no flags - returns cpu type only",
+cpuType:  "kvm64",
+flags:    cpuFlagsConfig{},
+expected: "kvm64",
+},
+{
+name:    "nested_virt only",
+cpuType: "kvm64",
+flags:   cpuFlagsConfig{NestedVirt: "on"},
+expected: "kvm64,flags=+nested-virt",
+},
+{
+name:    "nested_virt off",
+cpuType: "kvm64",
+flags:   cpuFlagsConfig{NestedVirt: "off"},
+expected: "kvm64,flags=-nested-virt",
+},
+{
+name:    "nested_virt with aes",
+cpuType: "kvm64",
+flags:   cpuFlagsConfig{AES: "on", NestedVirt: "on"},
+expected: "kvm64,flags=+aes;+nested-virt",
+},
+{
+name:    "multiple flags with nested_virt",
+cpuType: "host",
+flags:   cpuFlagsConfig{AES: "on", SpecCtrl: "off", NestedVirt: "on"},
+expected: "host,flags=+aes;-spec-ctrl;+nested-virt",
+},
+{
+name:    "standard flags without nested_virt",
+cpuType: "host",
+flags:   cpuFlagsConfig{AES: "on", Pdpe1GB: "off"},
+expected: "host,flags=+aes;-pdpe1gb",
+},
+}
+
+for _, tc := range testCases {
+t.Run(tc.name, func(t *testing.T) {
+result := buildCPUString(tc.cpuType, tc.flags)
+assert.Equal(t, tc.expected, result)
+})
+}
+}

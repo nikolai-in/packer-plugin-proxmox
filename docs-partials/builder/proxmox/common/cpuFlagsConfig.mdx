@@ -8,9 +8,10 @@ HCL2 example:
 ```hcl
 
 	cpu_flags {
-	  aes        = "on"
-	  pdpe1gb    = "off"
-	  spec_ctrl  = "on"
+	  aes          = "on"
+	  pdpe1gb      = "off"
+	  spec_ctrl    = "on"
+	  nested_virt  = "on"
 	}
 
 ```
@@ -22,7 +23,8 @@ JSON example:
 	"cpu_flags": {
 	  "aes": "on",
 	  "pdpe1gb": "off",
-	  "spec_ctrl": "on"
+	  "spec_ctrl": "on",
+	  "nested_virt": "on"
 	}
 
 ```
