@@ -132,6 +132,7 @@ func (s *stepStartVM) Run(ctx context.Context, state multistep.StateBag) multist
 			Sockets: (*proxmox.QemuCpuSockets)(&c.Sockets),
 			Numa:    &c.Numa,
 			Type:    (*proxmox.CpuType)(&c.CPUType),
+			Flags:   generateProxmoxCPUFlags(c.CPUFlags),
 		},
 		Description: &description,
 		Memory: &proxmox.QemuMemory{
@@ -780,6 +781,39 @@ func generateProxmoxTpm(tpm tpmConfig) *proxmox.TpmState {
 		Version: (*proxmox.TpmVersion)(&tpm.Version),
 	}
 	return &dev
+}
+
+func cpuFlagToTriBool(flag string) *proxmox.TriBool {
+	switch flag {
+	case "on":
+		v := proxmox.TriBoolTrue
+		return &v
+	case "off":
+		v := proxmox.TriBoolFalse
+		return &v
+	default:
+		return nil
+	}
+}
+
+func generateProxmoxCPUFlags(flags cpuFlagsConfig) *proxmox.CpuFlags {
+	if flags == (cpuFlagsConfig{}) {
+		return nil
+	}
+	return &proxmox.CpuFlags{
+		AES:        cpuFlagToTriBool(flags.AES),
+		AmdNoSSB:   cpuFlagToTriBool(flags.AmdNoSSB),
+		AmdSSBD:    cpuFlagToTriBool(flags.AmdSSBD),
+		HvEvmcs:    cpuFlagToTriBool(flags.HvEvmcs),
+		HvTlbFlush: cpuFlagToTriBool(flags.HvTlbFlush),
+		Ibpb:       cpuFlagToTriBool(flags.Ibpb),
+		MdClear:    cpuFlagToTriBool(flags.MdClear),
+		PCID:       cpuFlagToTriBool(flags.PCID),
+		Pdpe1GB:    cpuFlagToTriBool(flags.Pdpe1GB),
+		SSBD:       cpuFlagToTriBool(flags.SSBD),
+		SpecCtrl:   cpuFlagToTriBool(flags.SpecCtrl),
+		VirtSSBD:   cpuFlagToTriBool(flags.VirtSSBD),
+	}
 }
 
 func setDeviceParamIfDefined(dev proxmox.QemuDevice, key, value string) {

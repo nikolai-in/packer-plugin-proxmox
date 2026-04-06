@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: MPL-2.0
 
 //go:generate packer-sdc struct-markdown
-//go:generate packer-sdc mapstructure-to-hcl2 -type Config,NICConfig,diskConfig,rng0Config,pciDeviceConfig,vgaConfig,ISOsConfig,efiConfig,tpmConfig
+//go:generate packer-sdc mapstructure-to-hcl2 -type Config,NICConfig,diskConfig,rng0Config,pciDeviceConfig,vgaConfig,ISOsConfig,efiConfig,tpmConfig,cpuFlagsConfig
 
 package proxmox
 
@@ -122,6 +122,9 @@ type Config struct {
 	// If true, support for non-uniform memory access (NUMA)
 	// is enabled. Defaults to `false`.
 	Numa bool `mapstructure:"numa"`
+	// Set CPU flags to enable or disable specific CPU features.
+	// See [CPU Flags](#cpu-flags) for details on the available flags.
+	CPUFlags cpuFlagsConfig `mapstructure:"cpu_flags"`
 	// The operating system. Can be `wxp`, `w2k`, `w2k3`, `w2k8`,
 	// `wvista`, `win7`, `win8`, `win10`, `l24` (Linux 2.4), `l26` (Linux 2.6+),
 	// `solaris` or `other`. Defaults to `other`.
@@ -490,6 +493,71 @@ type rng0Config struct {
 	Period int `mapstructure:"period" required:"false"`
 }
 
+// - `cpu_flags` (object) - Set additional CPU flags to enable or disable specific CPU features.
+// Each flag can be set to `"on"` (force enable), `"off"` (force disable), or left unset (empty string, use default).
+//
+// HCL2 example:
+//
+// ```hcl
+//
+//	cpu_flags {
+//	  aes        = "on"
+//	  pdpe1gb    = "off"
+//	  spec_ctrl  = "on"
+//	}
+//
+// ```
+//
+// JSON example:
+//
+// ```json
+//
+//	"cpu_flags": {
+//	  "aes": "on",
+//	  "pdpe1gb": "off",
+//	  "spec_ctrl": "on"
+//	}
+//
+// ```
+type cpuFlagsConfig struct {
+	// Activate AES instruction set for HW acceleration.
+	// Can be `"on"`, `"off"`, or unset.
+	AES string `mapstructure:"aes"`
+	// Notifies guest OS that host is not vulnerable for Spectre on AMD CPUs.
+	// Can be `"on"`, `"off"`, or unset.
+	AmdNoSSB string `mapstructure:"amd_no_ssb"`
+	// Improves Spectre mitigation performance with AMD CPUs, best used with `virt_ssbd`.
+	// Can be `"on"`, `"off"`, or unset.
+	AmdSSBD string `mapstructure:"amd_ssbd"`
+	// Improve performance for nested virtualization. Only supported on Intel CPUs.
+	// Can be `"on"`, `"off"`, or unset.
+	HvEvmcs string `mapstructure:"hv_evmcs"`
+	// Improve performance in overcommitted Windows guests. May lead to guest bluescreens on old CPUs.
+	// Can be `"on"`, `"off"`, or unset.
+	HvTlbFlush string `mapstructure:"hv_tlb_flush"`
+	// Allows improved Spectre mitigation with AMD CPUs.
+	// Can be `"on"`, `"off"`, or unset.
+	Ibpb string `mapstructure:"ibpb"`
+	// Required to let the guest OS know if MDS is mitigated correctly.
+	// Can be `"on"`, `"off"`, or unset.
+	MdClear string `mapstructure:"md_clear"`
+	// Meltdown fix cost reduction on Westmere, Sandy-, and IvyBridge Intel CPUs.
+	// Can be `"on"`, `"off"`, or unset.
+	PCID string `mapstructure:"pcid"`
+	// Allow guest OS to use 1GB size pages, if host HW supports it.
+	// Can be `"on"`, `"off"`, or unset.
+	Pdpe1GB string `mapstructure:"pdpe1gb"`
+	// Protection for "Speculative Store Bypass" for Intel models.
+	// Can be `"on"`, `"off"`, or unset.
+	SSBD string `mapstructure:"ssbd"`
+	// Allows improved Spectre mitigation with Intel CPUs.
+	// Can be `"on"`, `"off"`, or unset.
+	SpecCtrl string `mapstructure:"spec_ctrl"`
+	// Basis for "Speculative Store Bypass" protection for AMD models.
+	// Can be `"on"`, `"off"`, or unset.
+	VirtSSBD string `mapstructure:"virt_ssbd"`
+}
+
 // - `vga` (object) - The graphics adapter to use. Example:
 //
 //	```json
@@ -669,6 +737,24 @@ func (c *Config) Prepare(upper interface{}, raws ...interface{}) ([]string, []st
 	if c.CPUType == "" {
 		log.Printf("CPU type not set, using default 'kvm64'")
 		c.CPUType = "kvm64"
+	}
+	for flagName, flagValue := range map[string]string{
+		"aes":         c.CPUFlags.AES,
+		"amd_no_ssb":  c.CPUFlags.AmdNoSSB,
+		"amd_ssbd":    c.CPUFlags.AmdSSBD,
+		"hv_evmcs":    c.CPUFlags.HvEvmcs,
+		"hv_tlb_flush": c.CPUFlags.HvTlbFlush,
+		"ibpb":        c.CPUFlags.Ibpb,
+		"md_clear":    c.CPUFlags.MdClear,
+		"pcid":        c.CPUFlags.PCID,
+		"pdpe1gb":     c.CPUFlags.Pdpe1GB,
+		"ssbd":        c.CPUFlags.SSBD,
+		"spec_ctrl":   c.CPUFlags.SpecCtrl,
+		"virt_ssbd":   c.CPUFlags.VirtSSBD,
+	} {
+		if flagValue != "" && flagValue != "on" && flagValue != "off" {
+			errs = packersdk.MultiErrorAppend(errs, fmt.Errorf("cpu_flags.%s must be 'on', 'off', or empty string, got %q", flagName, flagValue))
+		}
 	}
 	if c.OS == "" {
 		log.Printf("OS not set, using default 'other'")
