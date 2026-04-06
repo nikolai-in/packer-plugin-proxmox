@@ -96,6 +96,7 @@ type FlatConfig struct {
 	CPUType                   *string               `mapstructure:"cpu_type" cty:"cpu_type" hcl:"cpu_type"`
 	Sockets                   *uint8                `mapstructure:"sockets" cty:"sockets" hcl:"sockets"`
 	Numa                      *bool                 `mapstructure:"numa" cty:"numa" hcl:"numa"`
+	CPUFlags                  *FlatcpuFlagsConfig   `mapstructure:"cpu_flags" cty:"cpu_flags" hcl:"cpu_flags"`
 	OS                        *string               `mapstructure:"os" cty:"os" hcl:"os"`
 	BIOS                      *string               `mapstructure:"bios" cty:"bios" hcl:"bios"`
 	EFIConfig                 *FlatefiConfig        `mapstructure:"efi_config" cty:"efi_config" hcl:"efi_config"`
@@ -220,6 +221,7 @@ func (*FlatConfig) HCL2Spec() map[string]hcldec.Spec {
 		"cpu_type":                     &hcldec.AttrSpec{Name: "cpu_type", Type: cty.String, Required: false},
 		"sockets":                      &hcldec.AttrSpec{Name: "sockets", Type: cty.Number, Required: false},
 		"numa":                         &hcldec.AttrSpec{Name: "numa", Type: cty.Bool, Required: false},
+		"cpu_flags":                    &hcldec.BlockSpec{TypeName: "cpu_flags", Nested: hcldec.ObjectSpec((*FlatcpuFlagsConfig)(nil).HCL2Spec())},
 		"os":                           &hcldec.AttrSpec{Name: "os", Type: cty.String, Required: false},
 		"bios":                         &hcldec.AttrSpec{Name: "bios", Type: cty.String, Required: false},
 		"efi_config":                   &hcldec.BlockSpec{TypeName: "efi_config", Nested: hcldec.ObjectSpec((*FlatefiConfig)(nil).HCL2Spec())},
@@ -332,6 +334,53 @@ func (*FlatNICConfig) HCL2Spec() map[string]hcldec.Spec {
 		"bridge":        &hcldec.AttrSpec{Name: "bridge", Type: cty.String, Required: false},
 		"vlan_tag":      &hcldec.AttrSpec{Name: "vlan_tag", Type: cty.String, Required: false},
 		"firewall":      &hcldec.AttrSpec{Name: "firewall", Type: cty.Bool, Required: false},
+	}
+	return s
+}
+
+// FlatcpuFlagsConfig is an auto-generated flat version of cpuFlagsConfig.
+// Where the contents of a field with a `mapstructure:,squash` tag are bubbled up.
+type FlatcpuFlagsConfig struct {
+	AES        *string `mapstructure:"aes" cty:"aes" hcl:"aes"`
+	AmdNoSSB   *string `mapstructure:"amd_no_ssb" cty:"amd_no_ssb" hcl:"amd_no_ssb"`
+	AmdSSBD    *string `mapstructure:"amd_ssbd" cty:"amd_ssbd" hcl:"amd_ssbd"`
+	HvEvmcs    *string `mapstructure:"hv_evmcs" cty:"hv_evmcs" hcl:"hv_evmcs"`
+	HvTlbFlush *string `mapstructure:"hv_tlb_flush" cty:"hv_tlb_flush" hcl:"hv_tlb_flush"`
+	Ibpb       *string `mapstructure:"ibpb" cty:"ibpb" hcl:"ibpb"`
+	MdClear    *string `mapstructure:"md_clear" cty:"md_clear" hcl:"md_clear"`
+	PCID       *string `mapstructure:"pcid" cty:"pcid" hcl:"pcid"`
+	Pdpe1GB    *string `mapstructure:"pdpe1gb" cty:"pdpe1gb" hcl:"pdpe1gb"`
+	SSBD       *string `mapstructure:"ssbd" cty:"ssbd" hcl:"ssbd"`
+	SpecCtrl   *string `mapstructure:"spec_ctrl" cty:"spec_ctrl" hcl:"spec_ctrl"`
+	VirtSSBD   *string `mapstructure:"virt_ssbd" cty:"virt_ssbd" hcl:"virt_ssbd"`
+	NestedVirt *string `mapstructure:"nested_virt" cty:"nested_virt" hcl:"nested_virt"`
+}
+
+// FlatMapstructure returns a new FlatcpuFlagsConfig.
+// FlatcpuFlagsConfig is an auto-generated flat version of cpuFlagsConfig.
+// Where the contents a fields with a `mapstructure:,squash` tag are bubbled up.
+func (*cpuFlagsConfig) FlatMapstructure() interface{ HCL2Spec() map[string]hcldec.Spec } {
+	return new(FlatcpuFlagsConfig)
+}
+
+// HCL2Spec returns the hcl spec of a cpuFlagsConfig.
+// This spec is used by HCL to read the fields of cpuFlagsConfig.
+// The decoded values from this spec will then be applied to a FlatcpuFlagsConfig.
+func (*FlatcpuFlagsConfig) HCL2Spec() map[string]hcldec.Spec {
+	s := map[string]hcldec.Spec{
+		"aes":          &hcldec.AttrSpec{Name: "aes", Type: cty.String, Required: false},
+		"amd_no_ssb":   &hcldec.AttrSpec{Name: "amd_no_ssb", Type: cty.String, Required: false},
+		"amd_ssbd":     &hcldec.AttrSpec{Name: "amd_ssbd", Type: cty.String, Required: false},
+		"hv_evmcs":     &hcldec.AttrSpec{Name: "hv_evmcs", Type: cty.String, Required: false},
+		"hv_tlb_flush": &hcldec.AttrSpec{Name: "hv_tlb_flush", Type: cty.String, Required: false},
+		"ibpb":         &hcldec.AttrSpec{Name: "ibpb", Type: cty.String, Required: false},
+		"md_clear":     &hcldec.AttrSpec{Name: "md_clear", Type: cty.String, Required: false},
+		"pcid":         &hcldec.AttrSpec{Name: "pcid", Type: cty.String, Required: false},
+		"pdpe1gb":      &hcldec.AttrSpec{Name: "pdpe1gb", Type: cty.String, Required: false},
+		"ssbd":         &hcldec.AttrSpec{Name: "ssbd", Type: cty.String, Required: false},
+		"spec_ctrl":    &hcldec.AttrSpec{Name: "spec_ctrl", Type: cty.String, Required: false},
+		"virt_ssbd":    &hcldec.AttrSpec{Name: "virt_ssbd", Type: cty.String, Required: false},
+		"nested_virt":  &hcldec.AttrSpec{Name: "nested_virt", Type: cty.String, Required: false},
 	}
 	return s
 }

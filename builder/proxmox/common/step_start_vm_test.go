@@ -1309,3 +1309,145 @@ func TestGenerateProxmoxDisks(t *testing.T) {
 		})
 	}
 }
+
+func TestCpuFlagToTriBool(t *testing.T) {
+testCases := []struct {
+name     string
+input    string
+expected *proxmox.TriBool
+}{
+{
+name:     "on returns TriBoolTrue",
+input:    "on",
+expected: func() *proxmox.TriBool { v := proxmox.TriBoolTrue; return &v }(),
+},
+{
+name:     "off returns TriBoolFalse",
+input:    "off",
+expected: func() *proxmox.TriBool { v := proxmox.TriBoolFalse; return &v }(),
+},
+{
+name:     "empty string returns nil",
+input:    "",
+expected: nil,
+},
+}
+
+for _, tc := range testCases {
+t.Run(tc.name, func(t *testing.T) {
+result := cpuFlagToTriBool(tc.input)
+if tc.expected == nil {
+assert.Nil(t, result)
+} else {
+assert.NotNil(t, result)
+assert.Equal(t, *tc.expected, *result)
+}
+})
+}
+}
+
+func TestGenerateProxmoxCPUFlags(t *testing.T) {
+testCases := []struct {
+name     string
+input    cpuFlagsConfig
+expected *proxmox.CpuFlags
+}{
+{
+name:     "empty config returns nil",
+input:    cpuFlagsConfig{},
+expected: nil,
+},
+{
+name:  "AES on",
+input: cpuFlagsConfig{AES: "on"},
+expected: &proxmox.CpuFlags{
+AES: func() *proxmox.TriBool { v := proxmox.TriBoolTrue; return &v }(),
+},
+},
+{
+name:  "multiple flags",
+input: cpuFlagsConfig{AES: "on", SpecCtrl: "off", Pdpe1GB: "on"},
+expected: &proxmox.CpuFlags{
+AES:      func() *proxmox.TriBool { v := proxmox.TriBoolTrue; return &v }(),
+SpecCtrl: func() *proxmox.TriBool { v := proxmox.TriBoolFalse; return &v }(),
+Pdpe1GB:  func() *proxmox.TriBool { v := proxmox.TriBoolTrue; return &v }(),
+},
+},
+}
+
+for _, tc := range testCases {
+t.Run(tc.name, func(t *testing.T) {
+result := generateProxmoxCPUFlags(tc.input)
+if tc.expected == nil {
+assert.Nil(t, result)
+return
+}
+assert.NotNil(t, result)
+assert.Equal(t, tc.expected.AES, result.AES)
+assert.Equal(t, tc.expected.AmdNoSSB, result.AmdNoSSB)
+assert.Equal(t, tc.expected.AmdSSBD, result.AmdSSBD)
+assert.Equal(t, tc.expected.HvEvmcs, result.HvEvmcs)
+assert.Equal(t, tc.expected.HvTlbFlush, result.HvTlbFlush)
+assert.Equal(t, tc.expected.Ibpb, result.Ibpb)
+assert.Equal(t, tc.expected.MdClear, result.MdClear)
+assert.Equal(t, tc.expected.PCID, result.PCID)
+assert.Equal(t, tc.expected.Pdpe1GB, result.Pdpe1GB)
+assert.Equal(t, tc.expected.SSBD, result.SSBD)
+assert.Equal(t, tc.expected.SpecCtrl, result.SpecCtrl)
+assert.Equal(t, tc.expected.VirtSSBD, result.VirtSSBD)
+})
+}
+}
+
+func TestBuildCPUString(t *testing.T) {
+testCases := []struct {
+name     string
+cpuType  string
+flags    cpuFlagsConfig
+expected string
+}{
+{
+name:     "no flags - returns cpu type only",
+cpuType:  "kvm64",
+flags:    cpuFlagsConfig{},
+expected: "kvm64",
+},
+{
+name:    "nested_virt only",
+cpuType: "kvm64",
+flags:   cpuFlagsConfig{NestedVirt: "on"},
+expected: "kvm64,flags=+nested-virt",
+},
+{
+name:    "nested_virt off",
+cpuType: "kvm64",
+flags:   cpuFlagsConfig{NestedVirt: "off"},
+expected: "kvm64,flags=-nested-virt",
+},
+{
+name:    "nested_virt with aes",
+cpuType: "kvm64",
+flags:   cpuFlagsConfig{AES: "on", NestedVirt: "on"},
+expected: "kvm64,flags=+aes;+nested-virt",
+},
+{
+name:    "multiple flags with nested_virt",
+cpuType: "host",
+flags:   cpuFlagsConfig{AES: "on", SpecCtrl: "off", NestedVirt: "on"},
+expected: "host,flags=+aes;-spec-ctrl;+nested-virt",
+},
+{
+name:    "standard flags without nested_virt",
+cpuType: "host",
+flags:   cpuFlagsConfig{AES: "on", Pdpe1GB: "off"},
+expected: "host,flags=+aes;-pdpe1gb",
+},
+}
+
+for _, tc := range testCases {
+t.Run(tc.name, func(t *testing.T) {
+result := buildCPUString(tc.cpuType, tc.flags)
+assert.Equal(t, tc.expected, result)
+})
+}
+}

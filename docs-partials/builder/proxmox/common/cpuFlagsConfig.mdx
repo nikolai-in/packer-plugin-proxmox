@@ -1,0 +1,32 @@
+<!-- Code generated from the comments of the cpuFlagsConfig struct in builder/proxmox/common/config.go; DO NOT EDIT MANUALLY -->
+
+- `cpu_flags` (object) - Set additional CPU flags to enable or disable specific CPU features.
+Each flag can be set to `"on"` (force enable), `"off"` (force disable), or left unset (empty string, use default).
+
+HCL2 example:
+
+```hcl
+
+	cpu_flags {
+	  aes          = "on"
+	  pdpe1gb      = "off"
+	  spec_ctrl    = "on"
+	  nested_virt  = "on"
+	}
+
+```
+
+JSON example:
+
+```json
+
+	"cpu_flags": {
+	  "aes": "on",
+	  "pdpe1gb": "off",
+	  "spec_ctrl": "on",
+	  "nested_virt": "on"
+	}
+
+```
+
+<!-- End of code generated from the comments of the cpuFlagsConfig struct in builder/proxmox/common/config.go; -->
