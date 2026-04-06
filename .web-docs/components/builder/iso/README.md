@@ -32,41 +32,41 @@ in the image's Cloud-Init settings for provisioning.
 
 <!-- End of code generated from the comments of the Config struct in builder/proxmox/common/config.go; -->
 
+
 ### Required:
 
 <!-- Code generated from the comments of the Config struct in builder/proxmox/iso/config.go; DO NOT EDIT MANUALLY -->
 
 - `boot_iso` (common.ISOsConfig) - Boot ISO attached to the virtual machine.
-
+  
   JSON Example:
-
+  
   ```json
-
+  
   	"boot_iso": {
   			  "type": "scsi",
   			  "iso_file": "local:iso/debian-12.5.0-amd64-netinst.iso",
   			  "unmount": true,
   			  "iso_checksum": "sha512:33c08e56c83d13007e4a5511b9bf2c4926c4aa12fd5dd56d493c0653aecbab380988c5bf1671dbaea75c582827797d98c4a611f7fb2b131fbde2c677d5258ec9"
   		}
-
+  
   ```
-
   HCL2 example:
-
+  
   ```hcl
-
+  
   	boot_iso {
   	  type = "scsi"
   	  iso_file = "local:iso/debian-12.5.0-amd64-netinst.iso"
   	  unmount = true
   	  iso_checksum = "sha512:33c08e56c83d13007e4a5511b9bf2c4926c4aa12fd5dd56d493c0653aecbab380988c5bf1671dbaea75c582827797d98c4a611f7fb2b131fbde2c677d5258ec9"
   	}
-
+  
   ```
-
   See [ISOs](#isos) for additional options.
 
 <!-- End of code generated from the comments of the Config struct in builder/proxmox/iso/config.go; -->
+
 
 ### Optional:
 
@@ -104,7 +104,7 @@ in the image's Cloud-Init settings for provisioning.
 - `pool` (string) - Name of resource pool to create virtual machine in.
 
 - `task_timeout` (duration string | ex: "1h5m2s") - `task_timeout` (duration string | ex: "10m") - The timeout for
-  Promox API operations, e.g. clones. Defaults to 1 minute.
+   Promox API operations, e.g. clones. Defaults to 1 minute.
 
 - `vm_name` (string) - Name of the virtual machine during creation. If not
   given, a random uuid will be used.
@@ -173,10 +173,13 @@ in the image's Cloud-Init settings for provisioning.
   the virtual machine. It may pass through a host serial device `/dev/ttyS0`
   or create unix socket on the host `socket`. Each element can be `socket`
   or responding to pattern `/dev/.+`. Example:
-
-  ```json
-  ["socket", "/dev/ttyS1"]
-  ```
+  
+    ```json
+    [
+      "socket",
+      "/dev/ttyS1"
+    ]
+    ```
 
 - `qemu_agent` (boolean) - Enables QEMU Agent option for this VM. When enabled,
   then `qemu-guest-agent` must be installed on the guest. When disabled, then
@@ -214,9 +217,10 @@ in the image's Cloud-Init settings for provisioning.
 
 - `qemu_additional_args` (string) - Arbitrary arguments passed to KVM.
   For example `-no-reboot -smbios type=0,vendor=FOO`.
-  Note: this option is for experts only.
+  	Note: this option is for experts only.
 
 <!-- End of code generated from the comments of the Config struct in builder/proxmox/common/config.go; -->
+
 
 <!-- Code generated from the comments of the Config struct in builder/proxmox/iso/config.go; DO NOT EDIT MANUALLY -->
 
@@ -232,7 +236,7 @@ in the image's Cloud-Init settings for provisioning.
 
 - `iso_download_pve` (bool) - DEPRECATED. Define Boot ISO config with the `boot_iso` block instead.
   Download the ISO directly from the PVE node rather than through Packer.
-
+  
   Defaults to `false`
 
 - `unmount_iso` (bool) - DEPRECATED. Define Boot ISO config with the `boot_iso` block instead.
@@ -240,6 +244,7 @@ in the image's Cloud-Init settings for provisioning.
   after finishing. Defaults to `false`.
 
 <!-- End of code generated from the comments of the Config struct in builder/proxmox/iso/config.go; -->
+
 
 <!-- Code generated from the comments of the ISOConfig struct in multistep/commonsteps/iso_config.go; DO NOT EDIT MANUALLY -->
 
@@ -256,6 +261,7 @@ in the image's Cloud-Init settings for provisioning.
 - `iso_target_extension` (string) - The extension of the iso file after download. This defaults to `iso`.
 
 <!-- End of code generated from the comments of the ISOConfig struct in multistep/commonsteps/iso_config.go; -->
+
 
 ### ISOs
 
@@ -277,7 +283,6 @@ JSON Example:
 	 ]
 
 ```
-
 HCL2 example:
 
 ```hcl
@@ -293,6 +298,7 @@ HCL2 example:
 
 <!-- End of code generated from the comments of the ISOsConfig struct in builder/proxmox/common/config.go; -->
 
+
 #### Required
 
 <!-- Code generated from the comments of the ISOConfig struct in multistep/commonsteps/iso_config.go; DO NOT EDIT MANUALLY -->
@@ -304,24 +310,25 @@ HCL2 example:
   "none", "{$checksum}", "md5:{$checksum}", "sha1:{$checksum}",
   "sha256:{$checksum}", "sha512:{$checksum}" or "file:{$path}". Here is a
   list of valid checksum values:
-  - md5:090992ba9fd140077b0661cb75f7ce13
-  - 090992ba9fd140077b0661cb75f7ce13
-  - sha1:ebfb681885ddf1234c18094a45bbeafd91467911
-  - ebfb681885ddf1234c18094a45bbeafd91467911
-  - sha256:ed363350696a726b7932db864dda019bd2017365c9e299627830f06954643f93
-  - ed363350696a726b7932db864dda019bd2017365c9e299627830f06954643f93
-  - file:http://releases.ubuntu.com/20.04/SHA256SUMS
-  - file:file://./local/path/file.sum
-  - file:./local/path/file.sum
-  - none
-    Although the checksum will not be verified when it is set to "none",
-    this is not recommended since these files can be very large and
-    corruption does happen from time to time.
+   * md5:090992ba9fd140077b0661cb75f7ce13
+   * 090992ba9fd140077b0661cb75f7ce13
+   * sha1:ebfb681885ddf1234c18094a45bbeafd91467911
+   * ebfb681885ddf1234c18094a45bbeafd91467911
+   * sha256:ed363350696a726b7932db864dda019bd2017365c9e299627830f06954643f93
+   * ed363350696a726b7932db864dda019bd2017365c9e299627830f06954643f93
+   * file:http://releases.ubuntu.com/20.04/SHA256SUMS
+   * file:file://./local/path/file.sum
+   * file:./local/path/file.sum
+   * none
+  Although the checksum will not be verified when it is set to "none",
+  this is not recommended since these files can be very large and
+  corruption does happen from time to time.
 
 - `iso_url` (string) - A URL to the ISO containing the installation image or virtual hard drive
   (VHD or VHDX) file to clone.
 
 <!-- End of code generated from the comments of the ISOConfig struct in multistep/commonsteps/iso_config.go; -->
+
 
 #### Optional
 
@@ -340,6 +347,7 @@ HCL2 example:
 - `iso_target_extension` (string) - The extension of the iso file after download. This defaults to `iso`.
 
 <!-- End of code generated from the comments of the ISOConfig struct in multistep/commonsteps/iso_config.go; -->
+
 
 <!-- Code generated from the comments of the ISOsConfig struct in builder/proxmox/common/config.go; DO NOT EDIT MANUALLY -->
 
@@ -363,7 +371,7 @@ HCL2 example:
   the ISO file.
 
 - `iso_download_pve` (bool) - Download the ISO directly from the PVE node rather than through Packer.
-
+  
   Defaults to `false`
 
 - `unmount` (bool) - If true, remove the mounted ISO from the template after finishing. Defaults to `false`.
@@ -372,6 +380,7 @@ HCL2 example:
   Has no effect if unmount is `false`
 
 <!-- End of code generated from the comments of the ISOsConfig struct in builder/proxmox/common/config.go; -->
+
 
 <!-- Code generated from the comments of the CDConfig struct in multistep/commonsteps/extra_iso_config.go; DO NOT EDIT MANUALLY -->
 
@@ -387,6 +396,7 @@ boot time.
 
 <!-- End of code generated from the comments of the CDConfig struct in multistep/commonsteps/extra_iso_config.go; -->
 
+
 <!-- Code generated from the comments of the CDConfig struct in multistep/commonsteps/extra_iso_config.go; DO NOT EDIT MANUALLY -->
 
 - `cd_files` ([]string) - A list of files to place onto a CD that is attached when the VM is
@@ -394,51 +404,52 @@ boot time.
   will be copied onto the CD recursively, preserving directory structure
   hierarchy. Symlinks will have the link's target copied into the directory
   tree on the CD where the symlink was. File globbing is allowed.
-
+  
   Usage example (JSON):
-
+  
   ```json
   "cd_files": ["./somedirectory/meta-data", "./somedirectory/user-data"],
   "cd_label": "cidata",
   ```
-
+  
   Usage example (HCL):
-
+  
   ```hcl
   cd_files = ["./somedirectory/meta-data", "./somedirectory/user-data"]
   cd_label = "cidata"
   ```
-
+  
   The above will create a CD with two files, user-data and meta-data in the
   CD root. This specific example is how you would create a CD that can be
   used for an Ubuntu 20.04 autoinstall.
-
+  
   Since globbing is also supported,
-
+  
   ```hcl
   cd_files = ["./somedirectory/*"]
   cd_label = "cidata"
   ```
-
+  
   Would also be an acceptable way to define the above cd. The difference
   between providing the directory with or without the glob is whether the
   directory itself or its contents will be at the CD root.
-
+  
   Use of this option assumes that you have a command line tool installed
   that can handle the iso creation. Packer will use one of the following
   tools:
-  - xorriso
-  - mkisofs
-  - hdiutil (normally found in macOS)
-  - oscdimg (normally found in Windows as part of the Windows ADK)
+  
+    * xorriso
+    * mkisofs
+    * hdiutil (normally found in macOS)
+    * oscdimg (normally found in Windows as part of the Windows ADK)
 
 - `cd_content` (map[string]string) - Key/Values to add to the CD. The keys represent the paths, and the values
   contents. It can be used alongside `cd_files`, which is useful to add large
   files without loading them into memory. If any paths are specified by both,
   the contents in `cd_content` will take precedence.
-
+  
   Usage example (HCL):
-
+  
   ```hcl
   cd_files = ["vendor-data"]
   cd_content = {
@@ -452,20 +463,22 @@ boot time.
 
 <!-- End of code generated from the comments of the CDConfig struct in multistep/commonsteps/extra_iso_config.go; -->
 
+
 ### VGA Config
 
 <!-- Code generated from the comments of the vgaConfig struct in builder/proxmox/common/config.go; DO NOT EDIT MANUALLY -->
 
 - `vga` (object) - The graphics adapter to use. Example:
 
-  ```json
-  {
-    "type": "vmware",
-    "memory": 32
-  }
-  ```
+	```json
+	{
+	  "type": "vmware",
+	  "memory": 32
+	}
+	```
 
 <!-- End of code generated from the comments of the vgaConfig struct in builder/proxmox/common/config.go; -->
+
 
 #### Optional:
 
@@ -479,6 +492,7 @@ boot time.
 
 <!-- End of code generated from the comments of the vgaConfig struct in builder/proxmox/common/config.go; -->
 
+
 ### Network Adapters
 
 <!-- Code generated from the comments of the NICConfig struct in builder/proxmox/common/config.go; DO NOT EDIT MANUALLY -->
@@ -489,16 +503,19 @@ Example:
 
 ```json
 [
-  {
-    "model": "virtio",
-    "bridge": "vmbr0",
-    "vlan_tag": "10",
-    "firewall": true
-  }
+
+	{
+	  "model": "virtio",
+	  "bridge": "vmbr0",
+	  "vlan_tag": "10",
+	  "firewall": true
+	}
+
 ]
 ```
 
 <!-- End of code generated from the comments of the NICConfig struct in builder/proxmox/common/config.go; -->
+
 
 #### Optional:
 
@@ -537,6 +554,7 @@ Example:
 
 <!-- End of code generated from the comments of the NICConfig struct in builder/proxmox/common/config.go; -->
 
+
 ### Disks
 
 <!-- Code generated from the comments of the diskConfig struct in builder/proxmox/common/config.go; DO NOT EDIT MANUALLY -->
@@ -547,16 +565,19 @@ Example:
 
 ```json
 [
-  {
-    "type": "scsi",
-    "disk_size": "5G",
-    "storage_pool": "local-lvm",
-    "storage_pool_type": "lvm"
-  }
+
+	{
+	  "type": "scsi",
+	  "disk_size": "5G",
+	  "storage_pool": "local-lvm",
+	  "storage_pool_type": "lvm"
+	}
+
 ]
 ```
 
 <!-- End of code generated from the comments of the diskConfig struct in builder/proxmox/common/config.go; -->
+
 
 #### Optional:
 
@@ -603,10 +624,11 @@ Example:
 
 - `ssd` (bool) - Drive will be presented to the guest as solid-state drive
   rather than a rotational disk.
-
+  
   This cannot work with virtio disks.
 
 <!-- End of code generated from the comments of the diskConfig struct in builder/proxmox/common/config.go; -->
+
 
 ### EFI Config
 
@@ -618,15 +640,18 @@ This needs to be set if you use ovmf uefi boot (supersedes the `efidisk` option)
 Usage example (JSON):
 
 ```json
-{
-  "efi_storage_pool": "local",
-  "pre_enrolled_keys": true,
-  "efi_format": "raw",
-  "efi_type": "4m"
-}
+
+	{
+	  "efi_storage_pool": "local",
+	  "pre_enrolled_keys": true,
+	  "efi_format": "raw",
+	  "efi_type": "4m"
+	}
+
 ```
 
 <!-- End of code generated from the comments of the efiConfig struct in builder/proxmox/common/config.go; -->
+
 
 #### Optional:
 
@@ -646,14 +671,15 @@ Usage example (JSON):
 
 <!-- End of code generated from the comments of the efiConfig struct in builder/proxmox/common/config.go; -->
 
+
 ### VirtIO RNG device
 
 <!-- Code generated from the comments of the rng0Config struct in builder/proxmox/common/config.go; DO NOT EDIT MANUALLY -->
 
 - `rng0` (object): Configure Random Number Generator via VirtIO.
-  A virtual hardware-RNG can be used to provide entropy from the host system to a guest VM helping avoid entropy starvation which might cause the guest system slow down.
-  The device is sourced from a host device and guest, his use can be limited: `max_bytes` bytes of data will become available on a `period` ms timer.
-  [PVE documentation](https://pve.proxmox.com/pve-docs/pve-admin-guide.html) recommends to always use a limiter to avoid guests using too many host resources.
+A virtual hardware-RNG can be used to provide entropy from the host system to a guest VM helping avoid entropy starvation which might cause the guest system slow down.
+The device is sourced from a host device and guest, his use can be limited: `max_bytes` bytes of data will become available on a `period` ms timer.
+[PVE documentation](https://pve.proxmox.com/pve-docs/pve-admin-guide.html) recommends to always use a limiter to avoid guests using too many host resources.
 
 HCL2 example:
 
@@ -670,16 +696,19 @@ HCL2 example:
 JSON example:
 
 ```json
-{
-  "rng0": {
-    "source": "/dev/urandom",
-    "max_bytes": 1024,
-    "period": 1000
-  }
-}
+
+	{
+	    "rng0": {
+	        "source": "/dev/urandom",
+	        "max_bytes": 1024,
+	        "period": 1000
+	    }
+	}
+
 ```
 
 <!-- End of code generated from the comments of the rng0Config struct in builder/proxmox/common/config.go; -->
+
 
 #### Required:
 
@@ -697,6 +726,7 @@ JSON example:
 
 <!-- End of code generated from the comments of the rng0Config struct in builder/proxmox/common/config.go; -->
 
+
 #### Optional:
 
 <!-- Code generated from the comments of the rng0Config struct in builder/proxmox/common/config.go; DO NOT EDIT MANUALLY -->
@@ -706,6 +736,7 @@ JSON example:
   Recommended value: `1000`.
 
 <!-- End of code generated from the comments of the rng0Config struct in builder/proxmox/common/config.go; -->
+
 
 ### PCI devices
 
@@ -741,24 +772,27 @@ HCL2 example:
 JSON example:
 
 ```json
-{
-  "pci_devices": {
-    "host": "0000:0d:00.1",
-    "pcie": false,
-    "device_id": "1003",
-    "legacy_igd": false,
-    "mdev": "some-model",
-    "hide_rombar": false,
-    "romfile": "vbios.bin",
-    "sub_device_id": "",
-    "sub_vendor_id": "",
-    "vendor_id": "15B3",
-    "x_vga": false
-  }
-}
+
+	{
+	  "pci_devices": {
+	    "host"          : "0000:0d:00.1",
+	    "pcie"          : false,
+	    "device_id"     : "1003",
+	    "legacy_igd"    : false,
+	    "mdev"          : "some-model",
+	    "hide_rombar"   : false,
+	    "romfile"       : "vbios.bin",
+	    "sub_device_id" : "",
+	    "sub_vendor_id" : "",
+	    "vendor_id"     : "15B3",
+	    "x_vga"         : false
+	  }
+	}
+
 ```
 
 <!-- End of code generated from the comments of the pciDeviceConfig struct in builder/proxmox/common/config.go; -->
+
 
 #### Optional:
 
@@ -790,6 +824,7 @@ JSON example:
 
 <!-- End of code generated from the comments of the pciDeviceConfig struct in builder/proxmox/common/config.go; -->
 
+
 ### Boot Command
 
 <!-- Code generated from the comments of the BootConfig struct in bootcommand/config.go; DO NOT EDIT MANUALLY -->
@@ -805,62 +840,62 @@ sequence. It is an array only to improve readability within the template.
 There are a set of special keys available. If these are in your boot
 command, they will be replaced by the proper key:
 
-- `<bs>` - Backspace
+-   `<bs>` - Backspace
 
-- `<del>` - Delete
+-   `<del>` - Delete
 
-- `<enter> <return>` - Simulates an actual "enter" or "return" keypress.
+-   `<enter> <return>` - Simulates an actual "enter" or "return" keypress.
 
-- `<esc>` - Simulates pressing the escape key.
+-   `<esc>` - Simulates pressing the escape key.
 
-- `<tab>` - Simulates pressing the tab key.
+-   `<tab>` - Simulates pressing the tab key.
 
-- `<f1> - <f12>` - Simulates pressing a function key.
+-   `<f1> - <f12>` - Simulates pressing a function key.
 
-- `<up> <down> <left> <right>` - Simulates pressing an arrow key.
+-   `<up> <down> <left> <right>` - Simulates pressing an arrow key.
 
-- `<spacebar>` - Simulates pressing the spacebar.
+-   `<spacebar>` - Simulates pressing the spacebar.
 
-- `<insert>` - Simulates pressing the insert key.
+-   `<insert>` - Simulates pressing the insert key.
 
-- `<home> <end>` - Simulates pressing the home and end keys.
+-   `<home> <end>` - Simulates pressing the home and end keys.
 
-- `<pageUp> <pageDown>` - Simulates pressing the page up and page down
-  keys.
+  - `<pageUp> <pageDown>` - Simulates pressing the page up and page down
+    keys.
 
-- `<menu>` - Simulates pressing the Menu key.
+-   `<menu>` - Simulates pressing the Menu key.
 
-- `<leftAlt> <rightAlt>` - Simulates pressing the alt key.
+-   `<leftAlt> <rightAlt>` - Simulates pressing the alt key.
 
-- `<leftCtrl> <rightCtrl>` - Simulates pressing the ctrl key.
+-   `<leftCtrl> <rightCtrl>` - Simulates pressing the ctrl key.
 
-- `<leftShift> <rightShift>` - Simulates pressing the shift key.
+-   `<leftShift> <rightShift>` - Simulates pressing the shift key.
 
-- `<leftSuper> <rightSuper>` - Simulates pressing the ⌘ or Windows key.
+-   `<leftSuper> <rightSuper>` - Simulates pressing the ⌘ or Windows key.
 
-- `<wait> <wait5> <wait10>` - Adds a 1, 5 or 10 second pause before
-  sending any additional keys. This is useful if you have to generally
-  wait for the UI to update before typing more.
+  - `<wait> <wait5> <wait10>` - Adds a 1, 5 or 10 second pause before
+    sending any additional keys. This is useful if you have to generally
+    wait for the UI to update before typing more.
 
-- `<waitXX>` - Add an arbitrary pause before sending any additional keys.
-  The format of `XX` is a sequence of positive decimal numbers, each with
-  optional fraction and a unit suffix, such as `300ms`, `1.5h` or `2h45m`.
-  Valid time units are `ns`, `us` (or `µs`), `ms`, `s`, `m`, `h`. For
-  example `<wait10m>` or `<wait1m20s>`.
+  - `<waitXX>` - Add an arbitrary pause before sending any additional keys.
+    The format of `XX` is a sequence of positive decimal numbers, each with
+    optional fraction and a unit suffix, such as `300ms`, `1.5h` or `2h45m`.
+    Valid time units are `ns`, `us` (or `µs`), `ms`, `s`, `m`, `h`. For
+    example `<wait10m>` or `<wait1m20s>`.
 
-- `<XXXOn> <XXXOff>` - Any printable keyboard character, and of these
-  "special" expressions, with the exception of the `<wait>` types, can
-  also be toggled on or off. For example, to simulate ctrl+c, use
-  `<leftCtrlOn>c<leftCtrlOff>`. Be sure to release them, otherwise they
-  will be held down until the machine reboots. To hold the `c` key down,
-  you would use `<cOn>`. Likewise, `<cOff>` to release.
+  - `<XXXOn> <XXXOff>` - Any printable keyboard character, and of these
+    "special" expressions, with the exception of the `<wait>` types, can
+    also be toggled on or off. For example, to simulate ctrl+c, use
+    `<leftCtrlOn>c<leftCtrlOff>`. Be sure to release them, otherwise they
+    will be held down until the machine reboots. To hold the `c` key down,
+    you would use `<cOn>`. Likewise, `<cOff>` to release.
 
-- `{{ .HTTPIP }} {{ .HTTPPort }}` - The IP and port, respectively of an
-  HTTP server that is started serving the directory specified by the
-  `http_directory` configuration parameter. If `http_directory` isn't
-  specified, these will be blank!
+  - `{{ .HTTPIP }} {{ .HTTPPort }}` - The IP and port, respectively of an
+    HTTP server that is started serving the directory specified by the
+    `http_directory` configuration parameter. If `http_directory` isn't
+    specified, these will be blank!
 
-- `{{ .Name }}` - The name of the VM.
+-   `{{ .Name }}` - The name of the VM.
 
 Example boot command. This is actually a working boot command used to start an
 CentOS 6.4 installer:
@@ -931,6 +966,7 @@ For more examples of various boot commands, see the sample projects from our
 
 <!-- End of code generated from the comments of the BootConfig struct in bootcommand/config.go; -->
 
+
 #### Optional:
 
 <!-- Code generated from the comments of the BootConfig struct in bootcommand/config.go; DO NOT EDIT MANUALLY -->
@@ -956,6 +992,7 @@ For more examples of various boot commands, see the sample projects from our
 
 <!-- End of code generated from the comments of the BootConfig struct in bootcommand/config.go; -->
 
+
 ### Http directory configuration
 
 <!-- Code generated from the comments of the HTTPConfig struct in multistep/commonsteps/http_config.go; DO NOT EDIT MANUALLY -->
@@ -971,6 +1008,7 @@ wget http://{{ .HTTPIP }}:{{ .HTTPPort }}/foo/bar/preseed.cfg
 ```
 
 <!-- End of code generated from the comments of the HTTPConfig struct in multistep/commonsteps/http_config.go; -->
+
 
 #### Optional:
 
@@ -991,7 +1029,6 @@ wget http://{{ .HTTPIP }}:{{ .HTTPPort }}/foo/bar/preseed.cfg
   address and port of the HTTP server will be available as variables in
   `boot_command`. This is covered in more detail below.
   Example:
-
   ```hcl
     http_content = {
       "/a/b"     = file("http/b")
@@ -1015,6 +1052,7 @@ wget http://{{ .HTTPIP }}:{{ .HTTPPort }}/foo/bar/preseed.cfg
   `unix`, and `unixpacket`. This value defaults to `tcp`.
 
 <!-- End of code generated from the comments of the HTTPConfig struct in multistep/commonsteps/http_config.go; -->
+
 
 - `http_interface` - (string) - Name of the network interface that Packer gets
   `HTTPIP` from. Defaults to the first non loopback interface.

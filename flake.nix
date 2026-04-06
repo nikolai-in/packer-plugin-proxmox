@@ -66,17 +66,23 @@
 
                 # Code formatting
                 prettier = {
+                  excludes = [ "\\.web-docs/.*" "docs-partials/.*" ];
                   enable = true;
                 };
 
                 # File integrity
                 check-symlinks.enable = true;
                 check-case-conflicts.enable = true;
-                end-of-file-fixer.enable = true;
+                end-of-file-fixer = {
+                  enable = true;
+                  excludes = [ "\\.web-docs/.*" "docs-partials/.*" ];
+                };
                 trim-trailing-whitespace = {
                   enable = true;
                   excludes = [
                     "node_modules"
+                    "\\.web-docs/.*"
+                    "docs-partials/.*"
                   ];
                 };
                 mixed-line-endings.enable = true;
