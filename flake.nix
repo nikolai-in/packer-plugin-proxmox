@@ -44,6 +44,8 @@
               # Go
               go
               gcc
+
+              gnumake
             ];
 
             shellHook = ''
