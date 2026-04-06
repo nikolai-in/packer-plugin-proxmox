@@ -8,7 +8,7 @@ on:
         required: false
       branch:
         description: "A branch or SHA"
-        default: 'main'
+        default: "main"
         required: false
 jobs:
   strip-version:

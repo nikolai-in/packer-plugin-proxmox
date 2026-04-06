@@ -157,7 +157,7 @@ func (c *Config) Prepare(raws ...interface{}) ([]string, []string, error) {
 	if c.BootISO.ISOFile != "" {
 		options++
 	}
-	if len(c.BootISO.ISOConfig.ISOUrls) > 0 || c.BootISO.ISOConfig.RawSingleISOUrl != "" {
+	if len(c.BootISO.ISOUrls) > 0 || c.BootISO.RawSingleISOUrl != "" {
 		options++
 	}
 	if len(c.BootISO.CDFiles) > 0 || len(c.BootISO.CDContent) > 0 {
@@ -166,7 +166,7 @@ func (c *Config) Prepare(raws ...interface{}) ([]string, []string, error) {
 	if options != 1 {
 		errs = packersdk.MultiErrorAppend(errs, fmt.Errorf("one of iso_file, iso_url, or a combination of cd_files and cd_content must be specified for boot_iso"))
 	}
-	if len(c.BootISO.ISOConfig.ISOUrls) == 0 && c.BootISO.ISOConfig.RawSingleISOUrl == "" && c.BootISO.ISODownloadPVE {
+	if len(c.BootISO.ISOUrls) == 0 && c.BootISO.RawSingleISOUrl == "" && c.BootISO.ISODownloadPVE {
 		errs = packersdk.MultiErrorAppend(errs, fmt.Errorf("iso_download_pve can only be used together with iso_url"))
 	}
 

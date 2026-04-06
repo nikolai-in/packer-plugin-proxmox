@@ -2,3 +2,5 @@ main
 dist/*
 packer-plugin-proxmox
 crash.log
+.direnv
+.pre-commit-config.yaml

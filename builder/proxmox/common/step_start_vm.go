@@ -102,10 +102,7 @@ func (s *stepStartVM) Run(ctx context.Context, state multistep.StateBag) multist
 	client := state.Get("proxmoxClient").(vmStarter)
 	c := state.Get("config").(*Config)
 
-	kvm := true
-	if c.DisableKVM {
-		kvm = false
-	}
+	kvm := !c.DisableKVM
 
 	errs, warnings, disks := generateProxmoxDisks(c.Disks, c.ISOs, c.CloneSourceDisks)
 	if errs != nil && len(errs.Errors) > 0 {

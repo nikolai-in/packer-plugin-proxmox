@@ -10,7 +10,7 @@ name: "Go Validate"
 on:
   push:
     branches:
-      - 'main'
+      - "main"
   pull_request:
 
 permissions:
@@ -23,11 +23,12 @@ jobs:
       go-version: ${{ steps.get-go-version.outputs.go-version }}
     steps:
       - uses: actions/checkout@0ad4b8fadaa221de15dcec353f45205ec38ea70b # v4.1.4
-      - name: 'Determine Go version'
+      - name: "Determine Go version"
         id: get-go-version
         run: |
           echo "Found Go $(cat .go-version)"
-          echo "go-version=$(cat .go-version)" >> $GITHUB_OUTPUT
+          go_ver="$(cat .go-version)"
+          echo "go-version=$go_ver" >> "$GITHUB_OUTPUT"
   check-mod-tidy:
     needs:
       - get-go-version
@@ -66,7 +67,7 @@ jobs:
       - run: |
           go fmt ./...
           echo "==> Checking that code complies with go fmt requirements..."
-          git diff --exit-code; if [ $$? -eq 1 ]; then \
+          git diff --exit-code; if [ $? -eq 1 ]; then \
           echo "Found files that are not fmt'ed."; \
           echo "You can use the command: \`go fmt ./...\` to reformat code."; \
           exit 1; \
@@ -82,7 +83,8 @@ jobs:
         with:
           go-version: ${{ needs.get-go-version.outputs.go-version }}
       - run: |
-          export PATH=$PATH:$(go env GOPATH)/bin
+          PATH="$PATH:$(go env GOPATH)/bin"
+          export PATH
           make generate
           uncommitted="$(git status -s)"
           if [[ -z "$uncommitted" ]]; then

@@ -835,7 +835,7 @@ func (c *Config) Prepare(upper interface{}, raws ...interface{}) ([]string, []st
 		if c.ISOs[idx].ISOFile != "" {
 			options++
 		}
-		if len(c.ISOs[idx].ISOConfig.ISOUrls) > 0 || c.ISOs[idx].ISOConfig.RawSingleISOUrl != "" {
+		if len(c.ISOs[idx].ISOUrls) > 0 || c.ISOs[idx].RawSingleISOUrl != "" {
 			options++
 		}
 		if len(c.ISOs[idx].CDFiles) > 0 || len(c.ISOs[idx].CDContent) > 0 {
@@ -844,7 +844,7 @@ func (c *Config) Prepare(upper interface{}, raws ...interface{}) ([]string, []st
 		if options != 1 {
 			errs = packersdk.MultiErrorAppend(errs, fmt.Errorf("one of iso_file, iso_url, or a combination of cd_files and cd_content must be specified for additional_iso %d", idx))
 		}
-		if len(c.ISOs[idx].ISOConfig.ISOUrls) == 0 && c.ISOs[idx].ISOConfig.RawSingleISOUrl == "" && c.ISOs[idx].ISODownloadPVE {
+		if len(c.ISOs[idx].ISOUrls) == 0 && c.ISOs[idx].RawSingleISOUrl == "" && c.ISOs[idx].ISODownloadPVE {
 			errs = packersdk.MultiErrorAppend(errs, fmt.Errorf("iso_download_pve can only be used together with iso_url"))
 		}
 	}
@@ -875,7 +875,7 @@ func (c *Config) Prepare(upper interface{}, raws ...interface{}) ([]string, []st
 				errs = packersdk.MultiErrorAppend(errs, fmt.Errorf("io thread option requires virtio-scsi-single controller"))
 			} else {
 				// ... and only for virtio and scsi disks
-				if !(disk.Type == "scsi" || disk.Type == "virtio") {
+				if disk.Type != "scsi" && disk.Type != "virtio" {
 					errs = packersdk.MultiErrorAppend(errs, fmt.Errorf("io thread option requires scsi or a virtio disk"))
 				}
 			}
@@ -993,12 +993,12 @@ func (c *Config) Prepare(upper interface{}, raws ...interface{}) ([]string, []st
 			log.Printf("TPM state device defined, but no tpm_version given, using v2.0")
 			c.TPMConfig.Version = "v2.0"
 		}
-		if !(c.TPMConfig.Version == "v1.2" || c.TPMConfig.Version == "v2.0") {
+		if c.TPMConfig.Version != "v1.2" && c.TPMConfig.Version != "v2.0" {
 			errs = packersdk.MultiErrorAppend(errs, errors.New("TPM Version must be one of \"v1.2\", \"v2.0\""))
 		}
 	}
 	if c.Rng0 != (rng0Config{}) {
-		if !(c.Rng0.Source == "/dev/urandom" || c.Rng0.Source == "/dev/random" || c.Rng0.Source == "/dev/hwrng") {
+		if c.Rng0.Source != "/dev/urandom" && c.Rng0.Source != "/dev/random" && c.Rng0.Source != "/dev/hwrng" {
 			errs = packersdk.MultiErrorAppend(errs, errors.New("source must be one of \"/dev/urandom\", \"/dev/random\", \"/dev/hwrng\""))
 		}
 		if c.Rng0.MaxBytes < 0 {
