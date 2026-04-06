@@ -341,19 +341,18 @@ func (*FlatNICConfig) HCL2Spec() map[string]hcldec.Spec {
 // FlatcpuFlagsConfig is an auto-generated flat version of cpuFlagsConfig.
 // Where the contents of a field with a `mapstructure:,squash` tag are bubbled up.
 type FlatcpuFlagsConfig struct {
-	AES        *string `mapstructure:"aes" cty:"aes" hcl:"aes"`
-	AmdNoSSB   *string `mapstructure:"amd_no_ssb" cty:"amd_no_ssb" hcl:"amd_no_ssb"`
-	AmdSSBD    *string `mapstructure:"amd_ssbd" cty:"amd_ssbd" hcl:"amd_ssbd"`
-	HvEvmcs    *string `mapstructure:"hv_evmcs" cty:"hv_evmcs" hcl:"hv_evmcs"`
-	HvTlbFlush *string `mapstructure:"hv_tlb_flush" cty:"hv_tlb_flush" hcl:"hv_tlb_flush"`
-	Ibpb       *string `mapstructure:"ibpb" cty:"ibpb" hcl:"ibpb"`
-	MdClear    *string `mapstructure:"md_clear" cty:"md_clear" hcl:"md_clear"`
-	PCID       *string `mapstructure:"pcid" cty:"pcid" hcl:"pcid"`
-	Pdpe1GB    *string `mapstructure:"pdpe1gb" cty:"pdpe1gb" hcl:"pdpe1gb"`
-	SSBD       *string `mapstructure:"ssbd" cty:"ssbd" hcl:"ssbd"`
-	SpecCtrl   *string `mapstructure:"spec_ctrl" cty:"spec_ctrl" hcl:"spec_ctrl"`
-	VirtSSBD   *string `mapstructure:"virt_ssbd" cty:"virt_ssbd" hcl:"virt_ssbd"`
-	NestedVirt *string `mapstructure:"nested_virt" cty:"nested_virt" hcl:"nested_virt"`
+	AES        *bool `mapstructure:"aes" cty:"aes" hcl:"aes"`
+	AmdNoSSB   *bool `mapstructure:"amd_no_ssb" cty:"amd_no_ssb" hcl:"amd_no_ssb"`
+	AmdSSBD    *bool `mapstructure:"amd_ssbd" cty:"amd_ssbd" hcl:"amd_ssbd"`
+	HvEvmcs    *bool `mapstructure:"hv_evmcs" cty:"hv_evmcs" hcl:"hv_evmcs"`
+	HvTlbFlush *bool `mapstructure:"hv_tlb_flush" cty:"hv_tlb_flush" hcl:"hv_tlb_flush"`
+	Ibpb       *bool `mapstructure:"ibpb" cty:"ibpb" hcl:"ibpb"`
+	MdClear    *bool `mapstructure:"md_clear" cty:"md_clear" hcl:"md_clear"`
+	PCID       *bool `mapstructure:"pcid" cty:"pcid" hcl:"pcid"`
+	Pdpe1GB    *bool `mapstructure:"pdpe1gb" cty:"pdpe1gb" hcl:"pdpe1gb"`
+	SSBD       *bool `mapstructure:"ssbd" cty:"ssbd" hcl:"ssbd"`
+	SpecCtrl   *bool `mapstructure:"spec_ctrl" cty:"spec_ctrl" hcl:"spec_ctrl"`
+	VirtSSBD   *bool `mapstructure:"virt_ssbd" cty:"virt_ssbd" hcl:"virt_ssbd"`
 }
 
 // FlatMapstructure returns a new FlatcpuFlagsConfig.
@@ -368,19 +367,18 @@ func (*cpuFlagsConfig) FlatMapstructure() interface{ HCL2Spec() map[string]hclde
 // The decoded values from this spec will then be applied to a FlatcpuFlagsConfig.
 func (*FlatcpuFlagsConfig) HCL2Spec() map[string]hcldec.Spec {
 	s := map[string]hcldec.Spec{
-		"aes":          &hcldec.AttrSpec{Name: "aes", Type: cty.String, Required: false},
-		"amd_no_ssb":   &hcldec.AttrSpec{Name: "amd_no_ssb", Type: cty.String, Required: false},
-		"amd_ssbd":     &hcldec.AttrSpec{Name: "amd_ssbd", Type: cty.String, Required: false},
-		"hv_evmcs":     &hcldec.AttrSpec{Name: "hv_evmcs", Type: cty.String, Required: false},
-		"hv_tlb_flush": &hcldec.AttrSpec{Name: "hv_tlb_flush", Type: cty.String, Required: false},
-		"ibpb":         &hcldec.AttrSpec{Name: "ibpb", Type: cty.String, Required: false},
-		"md_clear":     &hcldec.AttrSpec{Name: "md_clear", Type: cty.String, Required: false},
-		"pcid":         &hcldec.AttrSpec{Name: "pcid", Type: cty.String, Required: false},
-		"pdpe1gb":      &hcldec.AttrSpec{Name: "pdpe1gb", Type: cty.String, Required: false},
-		"ssbd":         &hcldec.AttrSpec{Name: "ssbd", Type: cty.String, Required: false},
-		"spec_ctrl":    &hcldec.AttrSpec{Name: "spec_ctrl", Type: cty.String, Required: false},
-		"virt_ssbd":    &hcldec.AttrSpec{Name: "virt_ssbd", Type: cty.String, Required: false},
-		"nested_virt":  &hcldec.AttrSpec{Name: "nested_virt", Type: cty.String, Required: false},
+		"aes":          &hcldec.AttrSpec{Name: "aes", Type: cty.Bool, Required: false},
+		"amd_no_ssb":   &hcldec.AttrSpec{Name: "amd_no_ssb", Type: cty.Bool, Required: false},
+		"amd_ssbd":     &hcldec.AttrSpec{Name: "amd_ssbd", Type: cty.Bool, Required: false},
+		"hv_evmcs":     &hcldec.AttrSpec{Name: "hv_evmcs", Type: cty.Bool, Required: false},
+		"hv_tlb_flush": &hcldec.AttrSpec{Name: "hv_tlb_flush", Type: cty.Bool, Required: false},
+		"ibpb":         &hcldec.AttrSpec{Name: "ibpb", Type: cty.Bool, Required: false},
+		"md_clear":     &hcldec.AttrSpec{Name: "md_clear", Type: cty.Bool, Required: false},
+		"pcid":         &hcldec.AttrSpec{Name: "pcid", Type: cty.Bool, Required: false},
+		"pdpe1gb":      &hcldec.AttrSpec{Name: "pdpe1gb", Type: cty.Bool, Required: false},
+		"ssbd":         &hcldec.AttrSpec{Name: "ssbd", Type: cty.Bool, Required: false},
+		"spec_ctrl":    &hcldec.AttrSpec{Name: "spec_ctrl", Type: cty.Bool, Required: false},
+		"virt_ssbd":    &hcldec.AttrSpec{Name: "virt_ssbd", Type: cty.Bool, Required: false},
 	}
 	return s
 }

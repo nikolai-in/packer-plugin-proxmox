@@ -87,7 +87,8 @@ func (s *StepSshKeyPair) Run(ctx context.Context, state multistep.StateBag) mult
 			state.Put("error", fmt.Errorf("error saving debug key: %s", err))
 			return multistep.ActionHalt
 		}
-		defer f.Close() //nolint:errcheck
+		//nolint:errcheck
+		defer f.Close()
 
 		// Write the key out
 		if _, err := f.Write(kp.PrivateKeyPemBlock); err != nil {

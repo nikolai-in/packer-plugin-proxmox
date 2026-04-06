@@ -6,6 +6,7 @@ package proxmox
 import (
 	"encoding/json"
 	"io"
+
 	"net/http"
 	"net/http/httptest"
 	"net/url"
