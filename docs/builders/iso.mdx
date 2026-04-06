@@ -43,7 +43,6 @@ to you to use it or delete it.
 
 @include 'builder/proxmox/common/ISOsConfig.mdx'
 
-
 #### Required
 
 @include 'packer-plugin-sdk/multistep/commonsteps/ISOConfig-required.mdx'
@@ -216,12 +215,12 @@ build {
         }
       ],
       "efi_config": {
-          "efi_storage_pool": "local-lvm",
-          "pre_enrolled_keys": true,
-          "efi_type": "4m"
+        "efi_storage_pool": "local-lvm",
+        "pre_enrolled_keys": true,
+        "efi_type": "4m"
       },
       "iso": {
-          "iso_file": "local:iso/Fedora-Server-dvd-x86_64-29-1.2.iso"
+        "iso_file": "local:iso/Fedora-Server-dvd-x86_64-29-1.2.iso"
       },
       "http_directory": "config",
       "boot_wait": "10s",
@@ -237,4 +236,3 @@ build {
   ]
 }
 ```
-

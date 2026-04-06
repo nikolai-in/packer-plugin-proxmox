@@ -714,96 +714,96 @@ func TestPCIDeviceMapping(t *testing.T) {
 }
 
 func TestCPUFlagsValidation(t *testing.T) {
-testCases := []struct {
-name          string
-cpuFlags      map[string]interface{}
-expectedError error
-}{
-{
-name:          "no flags set - valid",
-cpuFlags:      map[string]interface{}{},
-expectedError: nil,
-},
-{
-name: "all flags set to on - valid",
-cpuFlags: map[string]interface{}{
-"aes":          "on",
-"amd_no_ssb":   "on",
-"amd_ssbd":     "on",
-"hv_evmcs":     "on",
-"hv_tlb_flush": "on",
-"ibpb":         "on",
-"md_clear":     "on",
-"pcid":         "on",
-"pdpe1gb":      "on",
-"ssbd":         "on",
-"spec_ctrl":    "on",
-"virt_ssbd":    "on",
-"nested_virt":  "on",
-},
-expectedError: nil,
-},
-{
-name: "nested_virt on - valid",
-cpuFlags: map[string]interface{}{
-"nested_virt": "on",
-},
-expectedError: nil,
-},
-{
-name: "nested_virt off - valid",
-cpuFlags: map[string]interface{}{
-"nested_virt": "off",
-},
-expectedError: nil,
-},
-{
-name: "invalid nested_virt value",
-cpuFlags: map[string]interface{}{
-"nested_virt": "yes",
-},
-expectedError: fmt.Errorf("cpu_flags.nested_virt must be 'on', 'off', or empty string"),
-},
-{
-name: "all flags set to off - valid",
-cpuFlags: map[string]interface{}{
-"aes":       "off",
-"spec_ctrl": "off",
-},
-expectedError: nil,
-},
-{
-name: "invalid flag value",
-cpuFlags: map[string]interface{}{
-"aes": "yes",
-},
-expectedError: fmt.Errorf("cpu_flags.aes must be 'on', 'off', or empty string"),
-},
-{
-name: "invalid flag value for spec_ctrl",
-cpuFlags: map[string]interface{}{
-"spec_ctrl": "enabled",
-},
-expectedError: fmt.Errorf("cpu_flags.spec_ctrl must be 'on', 'off', or empty string"),
-},
-}
+	testCases := []struct {
+		name          string
+		cpuFlags      map[string]interface{}
+		expectedError error
+	}{
+		{
+			name:          "no flags set - valid",
+			cpuFlags:      map[string]interface{}{},
+			expectedError: nil,
+		},
+		{
+			name: "all flags set to on - valid",
+			cpuFlags: map[string]interface{}{
+				"aes":          "on",
+				"amd_no_ssb":   "on",
+				"amd_ssbd":     "on",
+				"hv_evmcs":     "on",
+				"hv_tlb_flush": "on",
+				"ibpb":         "on",
+				"md_clear":     "on",
+				"pcid":         "on",
+				"pdpe1gb":      "on",
+				"ssbd":         "on",
+				"spec_ctrl":    "on",
+				"virt_ssbd":    "on",
+				"nested_virt":  "on",
+			},
+			expectedError: nil,
+		},
+		{
+			name: "nested_virt on - valid",
+			cpuFlags: map[string]interface{}{
+				"nested_virt": "on",
+			},
+			expectedError: nil,
+		},
+		{
+			name: "nested_virt off - valid",
+			cpuFlags: map[string]interface{}{
+				"nested_virt": "off",
+			},
+			expectedError: nil,
+		},
+		{
+			name: "invalid nested_virt value",
+			cpuFlags: map[string]interface{}{
+				"nested_virt": "yes",
+			},
+			expectedError: fmt.Errorf("cpu_flags.nested_virt must be 'on', 'off', or empty string"),
+		},
+		{
+			name: "all flags set to off - valid",
+			cpuFlags: map[string]interface{}{
+				"aes":       "off",
+				"spec_ctrl": "off",
+			},
+			expectedError: nil,
+		},
+		{
+			name: "invalid flag value",
+			cpuFlags: map[string]interface{}{
+				"aes": "yes",
+			},
+			expectedError: fmt.Errorf("cpu_flags.aes must be 'on', 'off', or empty string"),
+		},
+		{
+			name: "invalid flag value for spec_ctrl",
+			cpuFlags: map[string]interface{}{
+				"spec_ctrl": "enabled",
+			},
+			expectedError: fmt.Errorf("cpu_flags.spec_ctrl must be 'on', 'off', or empty string"),
+		},
+	}
 
-for _, tc := range testCases {
-t.Run(tc.name, func(t *testing.T) {
-cfg := mandatoryConfig(t)
-cfg["cpu_flags"] = tc.cpuFlags
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			cfg := mandatoryConfig(t)
+			cfg["cpu_flags"] = tc.cpuFlags
 
-var c Config
-_, _, err := c.Prepare(&c, cfg)
+			var c Config
+			_, _, err := c.Prepare(&c, cfg)
 
-switch {
-case tc.expectedError == nil && err != nil:
-t.Errorf("expected config preparation to succeed, but got: %s", err.Error())
-case tc.expectedError != nil && err == nil:
-t.Error("expected config preparation to fail, but no error occurred")
-case tc.expectedError != nil && !strings.Contains(err.Error(), tc.expectedError.Error()):
-t.Errorf("expected config preparation errors to contain %q, got %q", tc.expectedError, err)
-}
-})
-}
+			switch {
+			case tc.expectedError == nil && err != nil:
+				t.Errorf("expected config preparation to succeed, but got: %s", err.Error())
+			case tc.expectedError != nil && err == nil:
+				t.Error("expected config preparation to fail, but no error occurred")
+			case tc.expectedError != nil && !strings.Contains(err.Error(), tc.expectedError.Error()):
+				t.Errorf("expected config preparation errors to contain %q, got %q", tc.expectedError, err)
+			}
+		})
+	}
 }

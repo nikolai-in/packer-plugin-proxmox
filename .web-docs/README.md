@@ -14,6 +14,7 @@ packer {
   }
 }
 ```
+
 Alternatively, you can use `packer plugins install` to manage installation of this plugin.
 
 ```sh
@@ -34,4 +35,3 @@ Packer is able to target both ISO and existing Cloud-Init images.
   builder is able to create new images for use with Proxmox VE. The builder
   takes an ISO source, runs any provisioning necessary on the image after
   launching it, then creates a virtual machine template.
-

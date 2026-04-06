@@ -57,16 +57,14 @@ when addressing our team. For more reading on our code of conduct, please see th
 
 6. The issue is closed.
 
-
-
 ## Setting up Go
 
 If you have never worked with Go before, you will have to install its
 runtime in order to build packer with the Proxmox plugin.
 
 1. This project always releases from the latest version of golang.
-[Install go](https://golang.org/doc/install#install) To properly build from
-source, you need to have golang >= 1.21
+   [Install go](https://golang.org/doc/install#install) To properly build from
+   source, you need to have golang >= 1.21
 
 ## Setting up Proxmox plugin for dev
 
@@ -89,7 +87,6 @@ adjust them for Windows or other shells.
 
 5. If everything works well and the tests pass, run `go fmt ./...` on your code before
    submitting a pull-request.
-
 
 ### Opening a Pull Request
 

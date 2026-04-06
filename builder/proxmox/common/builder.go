@@ -85,9 +85,9 @@ func (b *Builder) Run(ctx context.Context, ui packersdk.Ui, hook packersdk.Hook,
 		} else {
 			preSteps = append(preSteps,
 				&commonsteps.StepCreateCD{
-					Files:   b.config.ISOs[idx].CDConfig.CDFiles,
-					Content: b.config.ISOs[idx].CDConfig.CDContent,
-					Label:   b.config.ISOs[idx].CDConfig.CDLabel,
+					Files:   b.config.ISOs[idx].CDFiles,
+					Content: b.config.ISOs[idx].CDContent,
+					Label:   b.config.ISOs[idx].CDLabel,
 				},
 				&commonsteps.StepDownload{
 					Checksum:    b.config.ISOs[idx].ISOChecksum,
@@ -169,9 +169,9 @@ func getVMIP(state multistep.StateBag) (string, error) {
 				}
 				return addr.String(), nil
 			}
-			return "", fmt.Errorf("Interface %s only has loopback addresses", config.VMInterface)
+			return "", fmt.Errorf("interface %s only has loopback addresses", config.VMInterface)
 		}
-		return "", fmt.Errorf("Interface %s not found in VM", config.VMInterface)
+		return "", fmt.Errorf("interface %s not found in VM", config.VMInterface)
 	}
 
 	for _, iface := range ifs {
@@ -186,5 +186,5 @@ func getVMIP(state multistep.StateBag) (string, error) {
 		}
 	}
 
-	return "", fmt.Errorf("Found no IP addresses on VM")
+	return "", fmt.Errorf("found no IP addresses on VM")
 }

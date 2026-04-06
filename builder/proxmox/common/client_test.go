@@ -5,7 +5,7 @@ package proxmox
 
 import (
 	"encoding/json"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"net/http/httptest"
 	"net/url"
@@ -47,7 +47,7 @@ func TestLogin(t *testing.T) {
 	mockAPI := httptest.NewServer(http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
 		// mock ticketing api
 		if req.Method == http.MethodPost && req.URL.Path == "/access/ticket" {
-			body, _ := ioutil.ReadAll(req.Body)
+			body, _ := io.ReadAll(req.Body)
 			values, _ := url.ParseQuery(string(body))
 			user := values.Get("username")
 			pass := values.Get("password")
