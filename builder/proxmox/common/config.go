@@ -343,7 +343,7 @@ type NICConfig struct {
 type diskConfig struct {
 	// The type of disk. Can be `scsi`, `sata`, `virtio` or
 	// `ide`. Defaults to `scsi`.
-	Type  string `mapstructure:"type"`
+	Type string `mapstructure:"type"`
 	// Optional: Used to specify the index of a disk. Can be used in combination
 	// with `type` and `size` to resize disks inherited from a cloned VM
 	Index string `mapstructure:"index" required:"false"`
@@ -494,16 +494,16 @@ type rng0Config struct {
 }
 
 // - `cpu_flags` (object) - Set additional CPU flags to enable or disable specific CPU features.
-// Each flag can be set to `"on"` (force enable), `"off"` (force disable), or left unset (empty string, use default).
+// Each flag can be set to `true` (force enable), `false` (force disable), or left unset (empty string, use default).
 //
 // HCL2 example:
 //
 // ```hcl
 //
 //	cpu_flags {
-//	  aes        = "on"
-//	  pdpe1gb    = "off"
-//	  spec_ctrl  = "on"
+//	  aes        = true
+//	  pdpe1gb    = false
+//	  spec_ctrl  = true
 //	}
 //
 // ```
@@ -513,49 +513,49 @@ type rng0Config struct {
 // ```json
 //
 //	"cpu_flags": {
-//	  "aes": "on",
-//	  "pdpe1gb": "off",
-//	  "spec_ctrl": "on"
+//	  "aes": true,
+//	  "pdpe1gb": false,
+//	  "spec_ctrl": true
 //	}
 //
 // ```
 type cpuFlagsConfig struct {
 	// Activate AES instruction set for HW acceleration.
-	// Can be `"on"`, `"off"`, or unset.
-	AES string `mapstructure:"aes"`
+	// Can be `true`, `false`, or unset.
+	AES *bool `mapstructure:"aes"`
 	// Notifies guest OS that host is not vulnerable for Spectre on AMD CPUs.
-	// Can be `"on"`, `"off"`, or unset.
-	AmdNoSSB string `mapstructure:"amd_no_ssb"`
+	// Can be `true`, `false`, or unset.
+	AmdNoSSB *bool `mapstructure:"amd_no_ssb"`
 	// Improves Spectre mitigation performance with AMD CPUs, best used with `virt_ssbd`.
-	// Can be `"on"`, `"off"`, or unset.
-	AmdSSBD string `mapstructure:"amd_ssbd"`
+	// Can be `true`, `false`, or unset.
+	AmdSSBD *bool `mapstructure:"amd_ssbd"`
 	// Improve performance for nested virtualization. Only supported on Intel CPUs.
-	// Can be `"on"`, `"off"`, or unset.
-	HvEvmcs string `mapstructure:"hv_evmcs"`
+	// Can be `true`, `false`, or unset.
+	HvEvmcs *bool `mapstructure:"hv_evmcs"`
 	// Improve performance in overcommitted Windows guests. May lead to guest bluescreens on old CPUs.
-	// Can be `"on"`, `"off"`, or unset.
-	HvTlbFlush string `mapstructure:"hv_tlb_flush"`
+	// Can be `true`, `false`, or unset.
+	HvTlbFlush *bool `mapstructure:"hv_tlb_flush"`
 	// Allows improved Spectre mitigation with AMD CPUs.
-	// Can be `"on"`, `"off"`, or unset.
-	Ibpb string `mapstructure:"ibpb"`
+	// Can be `true`, `false`, or unset.
+	Ibpb *bool `mapstructure:"ibpb"`
 	// Required to let the guest OS know if MDS is mitigated correctly.
-	// Can be `"on"`, `"off"`, or unset.
-	MdClear string `mapstructure:"md_clear"`
+	// Can be `true`, `false`, or unset.
+	MdClear *bool `mapstructure:"md_clear"`
 	// Meltdown fix cost reduction on Westmere, Sandy-, and IvyBridge Intel CPUs.
-	// Can be `"on"`, `"off"`, or unset.
-	PCID string `mapstructure:"pcid"`
+	// Can be `true`, `false`, or unset.
+	PCID *bool `mapstructure:"pcid"`
 	// Allow guest OS to use 1GB size pages, if host HW supports it.
-	// Can be `"on"`, `"off"`, or unset.
-	Pdpe1GB string `mapstructure:"pdpe1gb"`
+	// Can be `true`, `false`, or unset.
+	Pdpe1GB *bool `mapstructure:"pdpe1gb"`
 	// Protection for "Speculative Store Bypass" for Intel models.
-	// Can be `"on"`, `"off"`, or unset.
-	SSBD string `mapstructure:"ssbd"`
+	// Can be `true`, `false`, or unset.
+	SSBD *bool `mapstructure:"ssbd"`
 	// Allows improved Spectre mitigation with Intel CPUs.
-	// Can be `"on"`, `"off"`, or unset.
-	SpecCtrl string `mapstructure:"spec_ctrl"`
+	// Can be `true`, `false`, or unset.
+	SpecCtrl *bool `mapstructure:"spec_ctrl"`
 	// Basis for "Speculative Store Bypass" protection for AMD models.
-	// Can be `"on"`, `"off"`, or unset.
-	VirtSSBD string `mapstructure:"virt_ssbd"`
+	// Can be `true`, `false`, or unset.
+	VirtSSBD *bool `mapstructure:"virt_ssbd"`
 }
 
 // - `vga` (object) - The graphics adapter to use. Example:
@@ -737,24 +737,6 @@ func (c *Config) Prepare(upper interface{}, raws ...interface{}) ([]string, []st
 	if c.CPUType == "" {
 		log.Printf("CPU type not set, using default 'kvm64'")
 		c.CPUType = "kvm64"
-	}
-	for flagName, flagValue := range map[string]string{
-		"aes":         c.CPUFlags.AES,
-		"amd_no_ssb":  c.CPUFlags.AmdNoSSB,
-		"amd_ssbd":    c.CPUFlags.AmdSSBD,
-		"hv_evmcs":    c.CPUFlags.HvEvmcs,
-		"hv_tlb_flush": c.CPUFlags.HvTlbFlush,
-		"ibpb":        c.CPUFlags.Ibpb,
-		"md_clear":    c.CPUFlags.MdClear,
-		"pcid":        c.CPUFlags.PCID,
-		"pdpe1gb":     c.CPUFlags.Pdpe1GB,
-		"ssbd":        c.CPUFlags.SSBD,
-		"spec_ctrl":   c.CPUFlags.SpecCtrl,
-		"virt_ssbd":   c.CPUFlags.VirtSSBD,
-	} {
-		if flagValue != "" && flagValue != "on" && flagValue != "off" {
-			errs = packersdk.MultiErrorAppend(errs, fmt.Errorf("cpu_flags.%s must be 'on', 'off', or empty string, got %q", flagName, flagValue))
-		}
 	}
 	if c.OS == "" {
 		log.Printf("OS not set, using default 'other'")

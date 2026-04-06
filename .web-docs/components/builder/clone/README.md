@@ -207,6 +207,9 @@ boot time.
 - `numa` (bool) - If true, support for non-uniform memory access (NUMA)
   is enabled. Defaults to `false`.
 
+- `cpu_flags` (cpuFlagsConfig) - Set CPU flags to enable or disable specific CPU features.
+  See [CPU Flags](#cpu-flags) for details on the available flags.
+
 - `os` (string) - The operating system. Can be `wxp`, `w2k`, `w2k3`, `w2k8`,
   `wvista`, `win7`, `win8`, `win10`, `l24` (Linux 2.4), `l26` (Linux 2.6+),
   `solaris` or `other`. Defaults to `other`.
@@ -421,6 +424,9 @@ Example:
 
 - `type` (string) - The type of disk. Can be `scsi`, `sata`, `virtio` or
   `ide`. Defaults to `scsi`.
+
+- `index` (string) - Optional: Used to specify the index of a disk. Can be used in combination
+  with `type` and `size` to resize disks inherited from a cloned VM
 
 - `storage_pool` (string) - Required. Name of the Proxmox storage pool
   to store the virtual machine disk on. A `local-lvm` pool is allocated

@@ -97,6 +97,7 @@ type FlatConfig struct {
 	CPUType                   *string                       `mapstructure:"cpu_type" cty:"cpu_type" hcl:"cpu_type"`
 	Sockets                   *uint8                        `mapstructure:"sockets" cty:"sockets" hcl:"sockets"`
 	Numa                      *bool                         `mapstructure:"numa" cty:"numa" hcl:"numa"`
+	CPUFlags                  *proxmox.FlatcpuFlagsConfig   `mapstructure:"cpu_flags" cty:"cpu_flags" hcl:"cpu_flags"`
 	OS                        *string                       `mapstructure:"os" cty:"os" hcl:"os"`
 	BIOS                      *string                       `mapstructure:"bios" cty:"bios" hcl:"bios"`
 	EFIConfig                 *proxmox.FlatefiConfig        `mapstructure:"efi_config" cty:"efi_config" hcl:"efi_config"`
@@ -231,6 +232,7 @@ func (*FlatConfig) HCL2Spec() map[string]hcldec.Spec {
 		"cpu_type":                     &hcldec.AttrSpec{Name: "cpu_type", Type: cty.String, Required: false},
 		"sockets":                      &hcldec.AttrSpec{Name: "sockets", Type: cty.Number, Required: false},
 		"numa":                         &hcldec.AttrSpec{Name: "numa", Type: cty.Bool, Required: false},
+		"cpu_flags":                    &hcldec.BlockSpec{TypeName: "cpu_flags", Nested: hcldec.ObjectSpec((*proxmox.FlatcpuFlagsConfig)(nil).HCL2Spec())},
 		"os":                           &hcldec.AttrSpec{Name: "os", Type: cty.String, Required: false},
 		"bios":                         &hcldec.AttrSpec{Name: "bios", Type: cty.String, Required: false},
 		"efi_config":                   &hcldec.BlockSpec{TypeName: "efi_config", Nested: hcldec.ObjectSpec((*proxmox.FlatefiConfig)(nil).HCL2Spec())},

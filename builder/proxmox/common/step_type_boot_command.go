@@ -63,7 +63,7 @@ func (s *stepTypeBootCommand) Run(ctx context.Context, state multistep.StateBag)
 	} else {
 		httpIP, err = hostIP(c.HTTPInterface)
 		if err != nil {
-			err := fmt.Errorf("Failed to determine host IP: %s", err)
+			err := fmt.Errorf("failed to determine host IP: %s", err)
 			state.Put("error", err)
 			ui.Error(err.Error())
 			return multistep.ActionHalt
@@ -80,7 +80,7 @@ func (s *stepTypeBootCommand) Run(ctx context.Context, state multistep.StateBag)
 	d := NewProxmoxDriver(client, vmRef, c.BootKeyInterval)
 	command, err := interpolate.Render(s.FlatBootCommand(), &s.Ctx)
 	if err != nil {
-		err := fmt.Errorf("Error preparing boot command: %s", err)
+		err := fmt.Errorf("error preparing boot command: %s", err)
 		state.Put("error", err)
 		ui.Error(err.Error())
 		return multistep.ActionHalt
@@ -88,14 +88,14 @@ func (s *stepTypeBootCommand) Run(ctx context.Context, state multistep.StateBag)
 
 	seq, err := bootcommand.GenerateExpressionSequence(command)
 	if err != nil {
-		err := fmt.Errorf("Error generating boot command: %s", err)
+		err := fmt.Errorf("error generating boot command: %s", err)
 		state.Put("error", err)
 		ui.Error(err.Error())
 		return multistep.ActionHalt
 	}
 
 	if err := seq.Do(ctx, d); err != nil {
-		err := fmt.Errorf("Error running boot command: %s", err)
+		err := fmt.Errorf("error running boot command: %s", err)
 		state.Put("error", err)
 		ui.Error(err.Error())
 		return multistep.ActionHalt
@@ -132,5 +132,5 @@ func hostIP(ifname string) (string, error) {
 			}
 		}
 	}
-	return "", errors.New("No host IP found")
+	return "", errors.New("no host IP found")
 }

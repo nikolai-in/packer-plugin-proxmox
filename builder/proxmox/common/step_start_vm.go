@@ -217,7 +217,7 @@ func (s *stepStartVM) Run(ctx context.Context, state multistep.StateBag) multist
 			ui.Say("Generated VM ID was already allocated, retrying")
 			continue
 		}
-		err = fmt.Errorf("Error creating VM: %s", err)
+		err = fmt.Errorf("error creating VM: %s", err)
 		state.Put("error", err)
 		ui.Error(err.Error())
 		return multistep.ActionHalt
@@ -248,7 +248,7 @@ func (s *stepStartVM) Run(ctx context.Context, state multistep.StateBag) multist
 	ui.Say("Starting VM")
 	_, err := client.StartVm(vmRef)
 	if err != nil {
-		err := fmt.Errorf("Error starting VM: %s", err)
+		err := fmt.Errorf("error starting VM: %s", err)
 		state.Put("error", err)
 		ui.Error(err.Error())
 		return multistep.ActionHalt
@@ -783,17 +783,16 @@ func generateProxmoxTpm(tpm tpmConfig) *proxmox.TpmState {
 	return &dev
 }
 
-func cpuFlagToTriBool(flag string) *proxmox.TriBool {
-	switch flag {
-	case "on":
-		v := proxmox.TriBoolTrue
-		return &v
-	case "off":
-		v := proxmox.TriBoolFalse
-		return &v
-	default:
+func cpuFlagToTriBool(flag *bool) *proxmox.TriBool {
+	if flag == nil {
 		return nil
 	}
+	if *flag {
+		v := proxmox.TriBoolTrue
+		return &v
+	}
+	v := proxmox.TriBoolFalse
+	return &v
 }
 
 func generateProxmoxCPUFlags(flags cpuFlagsConfig) *proxmox.CpuFlags {

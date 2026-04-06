@@ -34,7 +34,7 @@ func (s *stepConvertToTemplate) Run(ctx context.Context, state multistep.StateBa
 	ui.Say("Stopping VM")
 	_, err := client.ShutdownVm(vmRef)
 	if err != nil {
-		err := fmt.Errorf("Error converting VM to template, could not stop: %s", err)
+		err := fmt.Errorf("error converting VM to template, could not stop: %s", err)
 		state.Put("error", err)
 		ui.Error(err.Error())
 		return multistep.ActionHalt
@@ -43,7 +43,7 @@ func (s *stepConvertToTemplate) Run(ctx context.Context, state multistep.StateBa
 	ui.Say("Converting VM to template")
 	err = client.CreateTemplate(vmRef)
 	if err != nil {
-		err := fmt.Errorf("Error converting VM to template: %s", err)
+		err := fmt.Errorf("error converting VM to template: %s", err)
 		state.Put("error", err)
 		ui.Error(err.Error())
 		return multistep.ActionHalt
