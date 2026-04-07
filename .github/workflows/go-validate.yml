@@ -51,7 +51,6 @@ jobs:
           go-version: ${{ needs.get-go-version.outputs.go-version }}
       - uses: golangci/golangci-lint-action@v6
         with:
-          version: v1.64.6
           only-new-issues: true
   check-fmt:
     needs:
