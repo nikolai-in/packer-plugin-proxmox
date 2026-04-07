@@ -1445,6 +1445,24 @@ func TestNestedVirtCPUParam(t *testing.T) {
 			flag:     "+nested-virt",
 			expected: "kvm64,flags=+nested-virt",
 		},
+		{
+			name:     "flags section with additional CPU options after - preserve all",
+			cpu:      "kvm64,flags=+aes,hidden=1",
+			flag:     "+nested-virt",
+			expected: "kvm64,flags=+aes;+nested-virt,hidden=1",
+		},
+		{
+			name:     "flags section with additional CPU option before and after",
+			cpu:      "kvm64,hv_vendor_id=proxmox,flags=+aes;+pcid,hidden=1",
+			flag:     "+nested-virt",
+			expected: "kvm64,hv_vendor_id=proxmox,flags=+aes;+pcid;+nested-virt,hidden=1",
+		},
+		{
+			name:     "replace nested-virt with other options present",
+			cpu:      "host,hv_vendor_id=proxmox,flags=+aes;-nested-virt,hidden=1",
+			flag:     "+nested-virt",
+			expected: "host,hv_vendor_id=proxmox,flags=+aes;+nested-virt,hidden=1",
+		},
 	}
 
 	for _, tc := range testCases {

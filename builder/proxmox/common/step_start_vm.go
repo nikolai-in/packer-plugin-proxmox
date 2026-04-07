@@ -823,11 +823,11 @@ func cpuFlagToTriBool(flag *bool) *proxmox.TriBool {
 
 func generateProxmoxCPUFlags(flags cpuFlagsConfig) *proxmox.CpuFlags {
 	// NestedVirt is handled separately (not part of the Telmate CpuFlags struct).
-	// Check only the flags that are actually forwarded to the library.
-	if flags.AES == nil && flags.AmdNoSSB == nil && flags.AmdSSBD == nil &&
-		flags.HvEvmcs == nil && flags.HvTlbFlush == nil && flags.Ibpb == nil &&
-		flags.MdClear == nil && flags.PCID == nil && flags.Pdpe1GB == nil &&
-		flags.SSBD == nil && flags.SpecCtrl == nil && flags.VirtSSBD == nil {
+	// Exclude only that field from the empty check to avoid duplicating the
+	// forwarded flag list here.
+	forwardedFlags := flags
+	forwardedFlags.NestedVirt = nil
+	if forwardedFlags == (cpuFlagsConfig{}) {
 		return nil
 	}
 	return &proxmox.CpuFlags{
@@ -848,32 +848,42 @@ func generateProxmoxCPUFlags(flags cpuFlagsConfig) *proxmox.CpuFlags {
 
 // nestedVirtCPUParam updates the Proxmox CPU parameter string to add or replace
 // the nested-virt flag. The flag argument must be "+nested-virt" or "-nested-virt".
-// If the cpu string already contains a flags section the nested-virt entry is
-// replaced; otherwise a new flags section is appended.
+// The CPU parameter string is treated as comma-separated segments (e.g.
+// "kvm64,flags=+aes;+pcid,hidden=1"). The flags= segment is located and updated
+// in place so that any other CPU options are preserved.
 func nestedVirtCPUParam(cpu, flag string) string {
-	const flagsPrefix = ",flags="
+	const flagsKey = "flags"
 	const nestedFlag = "nested-virt"
 
-	flagsIdx := strings.Index(cpu, flagsPrefix)
-	if flagsIdx == -1 {
-		return cpu + flagsPrefix + flag
+	segments := strings.Split(cpu, ",")
+	for i, segment := range segments {
+		key, value, found := strings.Cut(segment, "=")
+		if !found || key != flagsKey {
+			continue
+		}
+
+		var existingFlags []string
+		if value != "" {
+			existingFlags = strings.Split(value, ";")
+		}
+
+		replaced := false
+		for j, f := range existingFlags {
+			if len(f) == len(nestedFlag)+1 && f[1:] == nestedFlag {
+				existingFlags[j] = flag
+				replaced = true
+				break
+			}
+		}
+		if !replaced {
+			existingFlags = append(existingFlags, flag)
+		}
+
+		segments[i] = flagsKey + "=" + strings.Join(existingFlags, ";")
+		return strings.Join(segments, ",")
 	}
 
-	// Parse existing flags and replace/add nested-virt.
-	cpuType := cpu[:flagsIdx]
-	existingFlags := strings.Split(cpu[flagsIdx+len(flagsPrefix):], ";")
-	replaced := false
-	for i, f := range existingFlags {
-		if len(f) == len(nestedFlag)+1 && f[1:] == nestedFlag {
-			existingFlags[i] = flag
-			replaced = true
-			break
-		}
-	}
-	if !replaced {
-		existingFlags = append(existingFlags, flag)
-	}
-	return cpuType + flagsPrefix + strings.Join(existingFlags, ";")
+	return cpu + ",flags=" + flag
 }
 
 func setDeviceParamIfDefined(dev proxmox.QemuDevice, key, value string) {
