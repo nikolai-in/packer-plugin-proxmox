@@ -1309,3 +1309,166 @@ func TestGenerateProxmoxDisks(t *testing.T) {
 		})
 	}
 }
+
+func boolPtr(b bool) *bool {
+	return &b
+}
+
+func triBoolPtr(v proxmox.TriBool) *proxmox.TriBool {
+	return &v
+}
+
+func TestCpuFlagToTriBool(t *testing.T) {
+	testCases := []struct {
+		name     string
+		input    *bool
+		expected *proxmox.TriBool
+	}{
+		{
+			name:     "nil returns nil",
+			input:    nil,
+			expected: nil,
+		},
+		{
+			name:     "true returns TriBoolTrue",
+			input:    boolPtr(true),
+			expected: triBoolPtr(proxmox.TriBoolTrue),
+		},
+		{
+			name:     "false returns TriBoolFalse",
+			input:    boolPtr(false),
+			expected: triBoolPtr(proxmox.TriBoolFalse),
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			result := cpuFlagToTriBool(tc.input)
+			if tc.expected == nil {
+				assert.Nil(t, result)
+			} else {
+				assert.NotNil(t, result)
+				assert.Equal(t, *tc.expected, *result)
+			}
+		})
+	}
+}
+
+func TestGenerateProxmoxCPUFlags(t *testing.T) {
+	testCases := []struct {
+		name     string
+		input    cpuFlagsConfig
+		expected *proxmox.CpuFlags
+	}{
+		{
+			name:     "empty config returns nil",
+			input:    cpuFlagsConfig{},
+			expected: nil,
+		},
+		{
+			name:  "AES true",
+			input: cpuFlagsConfig{AES: boolPtr(true)},
+			expected: &proxmox.CpuFlags{
+				AES: triBoolPtr(proxmox.TriBoolTrue),
+			},
+		},
+		{
+			name:  "AES false",
+			input: cpuFlagsConfig{AES: boolPtr(false)},
+			expected: &proxmox.CpuFlags{
+				AES: triBoolPtr(proxmox.TriBoolFalse),
+			},
+		},
+		{
+			name: "multiple flags",
+			input: cpuFlagsConfig{
+				AES:      boolPtr(true),
+				SpecCtrl: boolPtr(false),
+				Pdpe1GB:  boolPtr(true),
+			},
+			expected: &proxmox.CpuFlags{
+				AES:      triBoolPtr(proxmox.TriBoolTrue),
+				SpecCtrl: triBoolPtr(proxmox.TriBoolFalse),
+				Pdpe1GB:  triBoolPtr(proxmox.TriBoolTrue),
+			},
+		},
+		{
+			// NestedVirt is handled separately; it must not block the nil-check for other flags
+			name:     "only nested_virt set returns nil CpuFlags (handled separately)",
+			input:    cpuFlagsConfig{NestedVirt: boolPtr(true)},
+			expected: nil,
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			result := generateProxmoxCPUFlags(tc.input)
+			assert.Equal(t, tc.expected, result)
+		})
+	}
+}
+
+func TestNestedVirtCPUParam(t *testing.T) {
+	testCases := []struct {
+		name     string
+		cpu      string
+		flag     string
+		expected string
+	}{
+		{
+			name:     "no flags section - enable",
+			cpu:      "kvm64",
+			flag:     "+nested-virt",
+			expected: "kvm64,flags=+nested-virt",
+		},
+		{
+			name:     "no flags section - disable",
+			cpu:      "host",
+			flag:     "-nested-virt",
+			expected: "host,flags=-nested-virt",
+		},
+		{
+			name:     "existing flags section - append",
+			cpu:      "kvm64,flags=+aes",
+			flag:     "+nested-virt",
+			expected: "kvm64,flags=+aes;+nested-virt",
+		},
+		{
+			name:     "replace existing nested-virt enable with disable",
+			cpu:      "kvm64,flags=+aes;+nested-virt;+pcid",
+			flag:     "-nested-virt",
+			expected: "kvm64,flags=+aes;-nested-virt;+pcid",
+		},
+		{
+			name:     "replace existing nested-virt disable with enable",
+			cpu:      "kvm64,flags=-nested-virt",
+			flag:     "+nested-virt",
+			expected: "kvm64,flags=+nested-virt",
+		},
+		{
+			name:     "flags section with additional CPU options after - preserve all",
+			cpu:      "kvm64,flags=+aes,hidden=1",
+			flag:     "+nested-virt",
+			expected: "kvm64,flags=+aes;+nested-virt,hidden=1",
+		},
+		{
+			name:     "flags section with additional CPU option before and after",
+			cpu:      "kvm64,hv_vendor_id=proxmox,flags=+aes;+pcid,hidden=1",
+			flag:     "+nested-virt",
+			expected: "kvm64,hv_vendor_id=proxmox,flags=+aes;+pcid;+nested-virt,hidden=1",
+		},
+		{
+			name:     "replace nested-virt with other options present",
+			cpu:      "host,hv_vendor_id=proxmox,flags=+aes;-nested-virt,hidden=1",
+			flag:     "+nested-virt",
+			expected: "host,hv_vendor_id=proxmox,flags=+aes;+nested-virt,hidden=1",
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			result := nestedVirtCPUParam(tc.cpu, tc.flag)
+			assert.Equal(t, tc.expected, result)
+		})
+	}
+}
