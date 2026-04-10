@@ -44,6 +44,9 @@ type Config struct {
 	// Additional Cloud-Init values to pass through to Proxmox as key/value pairs.
 	// Supports common keys like `ciuser`, `cipassword`, `sshkeys`, `ciupgrade`, `citype`,
 	// `nameserver`, `searchdomain`, `ipconfig0`...`ipconfig15`, and custom snippets via `cicustom`.
+	// This option is intended for values not otherwise modeled by this builder.
+	// If both dedicated fields (`nameserver`, `searchdomain`, `ipconfig`) and matching keys are set
+	// here, values from this map take precedence.
 	CloudInitAdditionalValues map[string]string `mapstructure:"cloud_init_additional_values" required:"false"`
 }
 
