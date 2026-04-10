@@ -304,6 +304,13 @@ func TestCloudInitAdditionalValues(t *testing.T) {
 			expectFailure: true,
 		},
 		{
+			name: "empty string value",
+			values: map[string]string{
+				"ciuser": "",
+			},
+			expectFailure: true,
+		},
+		{
 			name: "invalid ipconfig index",
 			values: map[string]string{
 				"ipconfig16": "ip=dhcp",

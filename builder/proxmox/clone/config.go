@@ -75,6 +75,8 @@ type cloudInitIpconfig struct {
 	Gateway6 string `mapstructure:"gateway6" required:"false"`
 }
 
+var allowedCloudInitAdditionalValueKey = regexp.MustCompile(`^(ciuser|cipassword|sshkeys|ciupgrade|citype|cicustom|nameserver|searchdomain|ipconfig([0-9]|1[0-5]))$`)
+
 func (c *Config) Prepare(raws ...interface{}) ([]string, []string, error) {
 	var errs *packersdk.MultiError
 	_, warnings, merrs := c.Config.Prepare(c, raws...)
@@ -134,9 +136,8 @@ func (c *Config) Prepare(raws ...interface{}) ([]string, []string, error) {
 		errs = packersdk.MultiErrorAppend(errs, fmt.Errorf("%d ipconfig blocks given, but only %d network interfaces defined", len(c.Ipconfigs), len(c.NICs)))
 	}
 
-	allowedCloudInitKey := regexp.MustCompile(`^(ciuser|cipassword|sshkeys|ciupgrade|citype|cicustom|nameserver|searchdomain|ipconfig([0-9]|1[0-5]))$`)
 	for key, value := range c.CloudInitAdditionalValues {
-		if !allowedCloudInitKey.MatchString(key) {
+		if !allowedCloudInitAdditionalValueKey.MatchString(key) {
 			errs = packersdk.MultiErrorAppend(errs, fmt.Errorf("cloud_init_additional_values key %q is not supported", key))
 		}
 		if strings.TrimSpace(value) == "" {
