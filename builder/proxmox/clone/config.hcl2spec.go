@@ -128,6 +128,7 @@ type FlatConfig struct {
 	Nameserver                *string                       `mapstructure:"nameserver" required:"false" cty:"nameserver" hcl:"nameserver"`
 	Searchdomain              *string                       `mapstructure:"searchdomain" required:"false" cty:"searchdomain" hcl:"searchdomain"`
 	Ipconfigs                 []FlatcloudInitIpconfig       `mapstructure:"ipconfig" required:"false" cty:"ipconfig" hcl:"ipconfig"`
+	CloudInitAdditionalValues map[string]string             `mapstructure:"cloud_init_additional_values" required:"false" cty:"cloud_init_additional_values" hcl:"cloud_init_additional_values"`
 }
 
 // FlatMapstructure returns a new FlatConfig.
@@ -259,6 +260,7 @@ func (*FlatConfig) HCL2Spec() map[string]hcldec.Spec {
 		"nameserver":                   &hcldec.AttrSpec{Name: "nameserver", Type: cty.String, Required: false},
 		"searchdomain":                 &hcldec.AttrSpec{Name: "searchdomain", Type: cty.String, Required: false},
 		"ipconfig":                     &hcldec.BlockListSpec{TypeName: "ipconfig", Nested: hcldec.ObjectSpec((*FlatcloudInitIpconfig)(nil).HCL2Spec())},
+		"cloud_init_additional_values": &hcldec.AttrSpec{Name: "cloud_init_additional_values", Type: cty.Map(cty.String), Required: false},
 	}
 	return s
 }

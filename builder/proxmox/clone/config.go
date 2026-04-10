@@ -11,6 +11,7 @@ import (
 	"fmt"
 	"net"
 	"net/netip"
+	"regexp"
 	"strings"
 
 	proxmoxcommon "github.com/hashicorp/packer-plugin-proxmox/builder/proxmox/common"
@@ -40,6 +41,10 @@ type Config struct {
 	// Set IP address and gateway via Cloud-Init.
 	// See the [CloudInit Ip Configuration](#cloudinit-ip-configuration) documentation for fields.
 	Ipconfigs []cloudInitIpconfig `mapstructure:"ipconfig" required:"false"`
+	// Additional Cloud-Init values to pass through to Proxmox as key/value pairs.
+	// Supports common keys like `ciuser`, `cipassword`, `sshkeys`, `ciupgrade`, `citype`,
+	// `nameserver`, `searchdomain`, `ipconfig0`...`ipconfig15`, and custom snippets via `cicustom`.
+	CloudInitAdditionalValues map[string]string `mapstructure:"cloud_init_additional_values" required:"false"`
 }
 
 // If you have configured more than one network interface, make sure to match the order of
@@ -127,6 +132,16 @@ func (c *Config) Prepare(raws ...interface{}) ([]string, []string, error) {
 	}
 	if len(c.NICs) < len(c.Ipconfigs) {
 		errs = packersdk.MultiErrorAppend(errs, fmt.Errorf("%d ipconfig blocks given, but only %d network interfaces defined", len(c.Ipconfigs), len(c.NICs)))
+	}
+
+	allowedCloudInitKey := regexp.MustCompile(`^(ciuser|cipassword|sshkeys|ciupgrade|citype|cicustom|nameserver|searchdomain|ipconfig([0-9]|1[0-5]))$`)
+	for key, value := range c.CloudInitAdditionalValues {
+		if !allowedCloudInitKey.MatchString(key) {
+			errs = packersdk.MultiErrorAppend(errs, fmt.Errorf("cloud_init_additional_values key %q is not supported", key))
+		}
+		if strings.TrimSpace(value) == "" {
+			errs = packersdk.MultiErrorAppend(errs, fmt.Errorf("cloud_init_additional_values[%q] must not be empty", key))
+		}
 	}
 
 	if errs != nil && len(errs.Errors) > 0 {

@@ -272,3 +272,59 @@ func TestIpconfig(t *testing.T) {
 		})
 	}
 }
+
+func TestCloudInitAdditionalValues(t *testing.T) {
+	tests := []struct {
+		name          string
+		values        map[string]string
+		expectFailure bool
+	}{
+		{
+			name: "valid values",
+			values: map[string]string{
+				"ciuser":    "cloud",
+				"citype":    "nocloud",
+				"ipconfig1": "ip=dhcp",
+				"cicustom":  "user=local:snippets/user-data.yaml",
+			},
+			expectFailure: false,
+		},
+		{
+			name: "invalid key",
+			values: map[string]string{
+				"cpu": "host",
+			},
+			expectFailure: true,
+		},
+		{
+			name: "empty value",
+			values: map[string]string{
+				"ciuser": "   ",
+			},
+			expectFailure: true,
+		},
+		{
+			name: "invalid ipconfig index",
+			values: map[string]string{
+				"ipconfig16": "ip=dhcp",
+			},
+			expectFailure: true,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			cfg := mandatoryConfig(t)
+			cfg["cloud_init_additional_values"] = tt.values
+
+			var c Config
+			_, _, err := c.Prepare(&c, cfg)
+			if err != nil && !tt.expectFailure {
+				t.Fatalf("unexpected failure: %s", err)
+			}
+			if err == nil && tt.expectFailure {
+				t.Errorf("expected failure, but prepare succeeded")
+			}
+		})
+	}
+}
