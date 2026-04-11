@@ -6,6 +6,7 @@ package proxmoxclone
 import (
 	"crypto"
 	"net/netip"
+	"sort"
 	"strings"
 
 	proxmoxapi "github.com/Telmate/proxmox-api-go/proxmox"
@@ -37,6 +38,14 @@ func (b *Builder) Prepare(raws ...interface{}) ([]string, []string, error) {
 func (b *Builder) Run(ctx context.Context, ui packersdk.Ui, hook packersdk.Hook) (packersdk.Artifact, error) {
 	state := new(multistep.BasicStateBag)
 	state.Put("clone-config", &b.config)
+	if len(b.config.CloudInitAdditionalValues) > 0 {
+		keys := make([]string, 0, len(b.config.CloudInitAdditionalValues))
+		for key := range b.config.CloudInitAdditionalValues {
+			keys = append(keys, key)
+		}
+		sort.Strings(keys)
+		state.Put("cloudInitAdditionalKeys", keys)
+	}
 
 	preSteps := []multistep.Step{
 		&StepSshKeyPair{
@@ -167,6 +176,18 @@ func (*cloneVMCreator) Create(vmRef *proxmoxapi.VmRef, config proxmoxapi.ConfigQ
 	_, err = config.Update(false, vmRef, client)
 	if err != nil {
 		return err
+	}
+
+	if len(c.CloudInitAdditionalValues) > 0 {
+		changes := make(map[string]interface{}, len(c.CloudInitAdditionalValues))
+		for key, value := range c.CloudInitAdditionalValues {
+			changes[key] = value
+		}
+
+		_, err = client.SetVmConfig(vmRef, changes)
+		if err != nil {
+			return err
+		}
 	}
 	return nil
 }

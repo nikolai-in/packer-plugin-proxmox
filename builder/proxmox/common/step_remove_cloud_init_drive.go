@@ -74,6 +74,13 @@ func (s *stepRemoveCloudInitDrive) Run(ctx context.Context, state multistep.Stat
 			delete = append(delete, parameter)
 		}
 	}
+	if additionalCloudInitKeys, ok := state.GetOk("cloudInitAdditionalKeys"); ok {
+		for _, parameter := range additionalCloudInitKeys.([]string) {
+			if vmParams[parameter] != nil {
+				delete = append(delete, parameter)
+			}
+		}
+	}
 
 	if len(delete) > 0 {
 		changes["delete"] = strings.Join(delete, ",")

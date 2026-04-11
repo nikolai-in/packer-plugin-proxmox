@@ -11,4 +11,11 @@
 - `ipconfig` ([]cloudInitIpconfig) - Set IP address and gateway via Cloud-Init.
   See the [CloudInit Ip Configuration](#cloudinit-ip-configuration) documentation for fields.
 
+- `cloud_init_additional_values` (map of string) - Additional Cloud-Init values to pass through to Proxmox as key/value pairs.
+  Supports common keys like `ciuser`, `cipassword`, `sshkeys`, `ciupgrade`, `citype`,
+  `nameserver`, `searchdomain`, `ipconfig0`...`ipconfig15`, and custom snippets via `cicustom`.
+  This option is intended for values not otherwise modeled by this builder.
+  If both dedicated fields (`nameserver`, `searchdomain`, `ipconfig`) and matching keys are set here,
+  `cloud_init_additional_values` takes precedence.
+
 <!-- End of code generated from the comments of the Config struct in builder/proxmox/clone/config.go; -->

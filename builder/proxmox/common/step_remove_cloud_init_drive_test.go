@@ -30,6 +30,7 @@ func TestRemoveCloudInitDrive(t *testing.T) {
 	cs := []struct {
 		name                string
 		builderConfig       *Config
+		additionalKeys      []string
 		initialVMConfig     map[string]interface{}
 		getConfigErr        error
 		expectCallSetConfig bool
@@ -85,6 +86,18 @@ func TestRemoveCloudInitDrive(t *testing.T) {
 			expectedDelete:      "cipassword,ciuser,nameserver,searchdomain,sshkeys,ipconfig0",
 			expectedAction:      multistep.ActionContinue,
 		},
+		{
+			name:           "remove additional cloud-init config options",
+			builderConfig:  &Config{},
+			additionalKeys: []string{"cicustom", "citype"},
+			initialVMConfig: map[string]interface{}{
+				"cicustom": "user=local:snippets/user.yaml",
+				"citype":   "nocloud",
+			},
+			expectCallSetConfig: true,
+			expectedDelete:      "cicustom,citype",
+			expectedAction:      multistep.ActionContinue,
+		},
 	}
 
 	for _, c := range cs {
@@ -110,6 +123,9 @@ func TestRemoveCloudInitDrive(t *testing.T) {
 			state.Put("config", c.builderConfig)
 			state.Put("vmRef", proxmox.NewVmRef(1))
 			state.Put("proxmoxClient", remover)
+			if len(c.additionalKeys) > 0 {
+				state.Put("cloudInitAdditionalKeys", c.additionalKeys)
+			}
 
 			step := stepRemoveCloudInitDrive{}
 			action := step.Run(context.TODO(), state)
