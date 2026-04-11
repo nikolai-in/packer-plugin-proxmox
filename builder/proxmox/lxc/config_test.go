@@ -45,6 +45,15 @@ func TestCreateAPIParams(t *testing.T) {
 	if got := params["password"]; got != "secret" {
 		t.Fatalf("expected lxc_config to be merged, got %v", got)
 	}
+	if got := params["start"]; got != true {
+		t.Fatalf("expected start=true, got %v", got)
+	}
+	if got := params["onboot"]; got != true {
+		t.Fatalf("expected onboot=true, got %v", got)
+	}
+	if got := params["unprivileged"]; got != true {
+		t.Fatalf("expected unprivileged=true, got %v", got)
+	}
 }
 
 func TestNetworkAdapterParamDefaults(t *testing.T) {
@@ -56,5 +65,26 @@ func TestNetworkAdapterParamDefaults(t *testing.T) {
 	want := "name=eth3,bridge=vmbr1"
 	if got != want {
 		t.Fatalf("unexpected network param, got %q want %q", got, want)
+	}
+}
+
+func TestCreateAPIParamsIncludesFalseBooleans(t *testing.T) {
+	c := &Config{
+		VMName:     "ct-test",
+		Ostemplate: "local:vztmpl/debian-12-standard_12.7-1_amd64.tar.zst",
+		Memory:     512,
+		Cores:      1,
+	}
+
+	params := c.createAPIParams(602)
+
+	if got := params["start"]; got != false {
+		t.Fatalf("expected start=false, got %v", got)
+	}
+	if got := params["onboot"]; got != false {
+		t.Fatalf("expected onboot=false, got %v", got)
+	}
+	if got := params["unprivileged"]; got != false {
+		t.Fatalf("expected unprivileged=false, got %v", got)
 	}
 }

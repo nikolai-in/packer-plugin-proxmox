@@ -138,11 +138,14 @@ func (c *Config) Prepare(raws ...interface{}) ([]string, []string, error) {
 
 func (c *Config) createAPIParams(vmid int) map[string]interface{} {
 	params := map[string]interface{}{
-		"vmid":       vmid,
-		"ostemplate": c.Ostemplate,
-		"hostname":   c.VMName,
-		"memory":     c.Memory,
-		"cores":      c.Cores,
+		"vmid":         vmid,
+		"ostemplate":   c.Ostemplate,
+		"hostname":     c.VMName,
+		"memory":       c.Memory,
+		"cores":        c.Cores,
+		"onboot":       c.Onboot,
+		"start":        c.Start,
+		"unprivileged": c.Unprivileged,
 	}
 
 	if c.Pool != "" {
@@ -150,12 +153,6 @@ func (c *Config) createAPIParams(vmid int) map[string]interface{} {
 	}
 	if c.RootFS != "" {
 		params["rootfs"] = c.RootFS
-	}
-	if c.Onboot {
-		params["onboot"] = c.Onboot
-	}
-	if c.Start {
-		params["start"] = c.Start
 	}
 	if c.Tags != "" {
 		params["tags"] = c.Tags
@@ -166,10 +163,6 @@ func (c *Config) createAPIParams(vmid int) map[string]interface{} {
 	if c.SearchDomain != "" {
 		params["searchdomain"] = c.SearchDomain
 	}
-	if c.Unprivileged {
-		params["unprivileged"] = c.Unprivileged
-	}
-
 	for idx, nic := range c.NetworkAdapters {
 		params[fmt.Sprintf("net%d", idx)] = nic.apiParam(idx)
 	}
