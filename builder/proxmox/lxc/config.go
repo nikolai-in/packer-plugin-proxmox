@@ -26,27 +26,27 @@ type Config struct {
 	ProxmoxURLRaw string `mapstructure:"proxmox_url"`
 	proxmoxURL    *url.URL
 
-	SkipCertValidation bool `mapstructure:"insecure_skip_tls_verify"`
-	Username           string `mapstructure:"username"`
-	Password           string `mapstructure:"password"`
-	Token              string `mapstructure:"token"`
-	Node               string `mapstructure:"node"`
-	Pool               string `mapstructure:"pool"`
+	SkipCertValidation bool          `mapstructure:"insecure_skip_tls_verify"`
+	Username           string        `mapstructure:"username"`
+	Password           string        `mapstructure:"password"`
+	Token              string        `mapstructure:"token"`
+	Node               string        `mapstructure:"node"`
+	Pool               string        `mapstructure:"pool"`
 	TaskTimeout        time.Duration `mapstructure:"task_timeout"`
 
 	VMName string `mapstructure:"vm_name"`
 	VMID   int    `mapstructure:"vm_id"`
 
-	Ostemplate string `mapstructure:"ostemplate"`
-	RootFS     string `mapstructure:"rootfs"`
-	Memory     int    `mapstructure:"memory"`
-	Cores      int    `mapstructure:"cores"`
-	Onboot     bool   `mapstructure:"onboot"`
-	Start      bool   `mapstructure:"start"`
-	Tags       string `mapstructure:"tags"`
-	Nameserver string `mapstructure:"nameserver"`
+	Ostemplate   string `mapstructure:"ostemplate"`
+	RootFS       string `mapstructure:"rootfs"`
+	Memory       int    `mapstructure:"memory"`
+	Cores        int    `mapstructure:"cores"`
+	Onboot       bool   `mapstructure:"onboot"`
+	Start        bool   `mapstructure:"start"`
+	Tags         string `mapstructure:"tags"`
+	Nameserver   string `mapstructure:"nameserver"`
 	SearchDomain string `mapstructure:"searchdomain"`
-	Unprivileged bool `mapstructure:"unprivileged"`
+	Unprivileged bool   `mapstructure:"unprivileged"`
 
 	NetworkAdapters []NetworkAdapterConfig `mapstructure:"network_adapters"`
 	LXCConfig       map[string]string      `mapstructure:"lxc_config"`

@@ -9,13 +9,13 @@ import (
 
 func TestCreateAPIParams(t *testing.T) {
 	c := &Config{
-		VMName:      "ct-test",
-		Ostemplate:  "local:vztmpl/debian-12-standard_12.7-1_amd64.tar.zst",
-		Memory:      1024,
-		Cores:       2,
-		RootFS:      "local-lvm:8",
-		Start:       true,
-		Onboot:      true,
+		VMName:       "ct-test",
+		Ostemplate:   "local:vztmpl/debian-12-standard_12.7-1_amd64.tar.zst",
+		Memory:       1024,
+		Cores:        2,
+		RootFS:       "local-lvm:8",
+		Start:        true,
+		Onboot:       true,
 		Unprivileged: true,
 		NetworkAdapters: []NetworkAdapterConfig{
 			{
