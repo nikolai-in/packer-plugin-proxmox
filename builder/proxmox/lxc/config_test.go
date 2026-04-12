@@ -26,8 +26,9 @@ func TestCreateAPIParams(t *testing.T) {
 				VLANTag:  "10",
 			},
 		},
-		LXCConfig: map[string]string{
+		LXCConfig: map[string]interface{}{
 			"password": "secret",
+			"swap":     1024,
 		},
 	}
 
@@ -44,6 +45,9 @@ func TestCreateAPIParams(t *testing.T) {
 	}
 	if got := params["password"]; got != "secret" {
 		t.Fatalf("expected lxc_config to be merged, got %v", got)
+	}
+	if got := params["swap"]; got != 1024 {
+		t.Fatalf("expected typed lxc_config integer to be merged, got %v", got)
 	}
 	if got := params["start"]; got != true {
 		t.Fatalf("expected start=true, got %v", got)
