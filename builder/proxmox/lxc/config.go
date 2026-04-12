@@ -49,7 +49,7 @@ type Config struct {
 	Unprivileged bool   `mapstructure:"unprivileged"`
 
 	NetworkAdapters []NetworkAdapterConfig `mapstructure:"network_adapters"`
-	LXCConfig       map[string]string      `mapstructure:"lxc_config"`
+	LXCConfig       map[string]interface{} `mapstructure:"lxc_config"`
 
 	Ctx interpolate.Context `mapstructure-to-hcl2:",skip"`
 }
@@ -83,6 +83,11 @@ func (c *Config) Prepare(raws ...interface{}) ([]string, []string, error) {
 	var errs *packersdk.MultiError
 
 	packersdk.LogSecretFilter.Set(c.Password)
+	if passwordValue, ok := c.LXCConfig["password"]; ok {
+		if password, ok := passwordValue.(string); ok {
+			packersdk.LogSecretFilter.Set(password)
+		}
+	}
 
 	if c.ProxmoxURLRaw == "" {
 		c.ProxmoxURLRaw = os.Getenv("PROXMOX_URL")
