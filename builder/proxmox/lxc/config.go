@@ -51,6 +51,13 @@ type Config struct {
 	NetworkAdapters []NetworkAdapterConfig `mapstructure:"network_adapters"`
 	LXCConfig       map[string]interface{} `mapstructure:"lxc_config"`
 
+	Type        string        `mapstructure:"communicator"`
+	SSHHost     string        `mapstructure:"ssh_host"`
+	SSHPort     int           `mapstructure:"ssh_port"`
+	SSHUsername string        `mapstructure:"ssh_username"`
+	SSHPassword string        `mapstructure:"ssh_password"`
+	SSHTimeout  time.Duration `mapstructure:"ssh_timeout"`
+
 	Ctx interpolate.Context `mapstructure-to-hcl2:",skip"`
 }
 

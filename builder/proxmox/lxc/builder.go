@@ -25,7 +25,7 @@ type Builder struct {
 // Builder implements packersdk.Builder.
 var _ packersdk.Builder = &Builder{}
 
-func (b *Builder) ConfigSpec() hcldec.ObjectSpec { return nil }
+func (b *Builder) ConfigSpec() hcldec.ObjectSpec { return b.config.FlatMapstructure().HCL2Spec() }
 
 func (b *Builder) Prepare(raws ...interface{}) ([]string, []string, error) {
 	return b.config.Prepare(raws...)
