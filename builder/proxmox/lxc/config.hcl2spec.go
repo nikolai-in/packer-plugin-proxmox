@@ -31,19 +31,24 @@ type FlatConfig struct {
 	VMName *string `mapstructure:"vm_name" cty:"vm_name" hcl:"vm_name"`
 	VMID   *int    `mapstructure:"vm_id" cty:"vm_id" hcl:"vm_id"`
 
-	Ostemplate   *string `mapstructure:"ostemplate" cty:"ostemplate" hcl:"ostemplate"`
-	RootFS       *string `mapstructure:"rootfs" cty:"rootfs" hcl:"rootfs"`
-	Memory       *int    `mapstructure:"memory" cty:"memory" hcl:"memory"`
-	Cores        *int    `mapstructure:"cores" cty:"cores" hcl:"cores"`
-	Onboot       *bool   `mapstructure:"onboot" cty:"onboot" hcl:"onboot"`
-	Start        *bool   `mapstructure:"start" cty:"start" hcl:"start"`
-	Tags         *string `mapstructure:"tags" cty:"tags" hcl:"tags"`
-	Nameserver   *string `mapstructure:"nameserver" cty:"nameserver" hcl:"nameserver"`
-	SearchDomain *string `mapstructure:"searchdomain" cty:"searchdomain" hcl:"searchdomain"`
-	Unprivileged *bool   `mapstructure:"unprivileged" cty:"unprivileged" hcl:"unprivileged"`
+	Ostemplate          *string `mapstructure:"ostemplate" cty:"ostemplate" hcl:"ostemplate"`
+	RootFS              *string `mapstructure:"rootfs" cty:"rootfs" hcl:"rootfs"`
+	Memory              *int    `mapstructure:"memory" cty:"memory" hcl:"memory"`
+	Cores               *int    `mapstructure:"cores" cty:"cores" hcl:"cores"`
+	Onboot              *bool   `mapstructure:"onboot" cty:"onboot" hcl:"onboot"`
+	Start               *bool   `mapstructure:"start" cty:"start" hcl:"start"`
+	Tags                *string `mapstructure:"tags" cty:"tags" hcl:"tags"`
+	Nameserver          *string `mapstructure:"nameserver" cty:"nameserver" hcl:"nameserver"`
+	SearchDomain        *string `mapstructure:"searchdomain" cty:"searchdomain" hcl:"searchdomain"`
+	Unprivileged        *bool   `mapstructure:"unprivileged" cty:"unprivileged" hcl:"unprivileged"`
+	Features            *string `mapstructure:"features" cty:"features" hcl:"features"`
+	Template            *bool   `mapstructure:"template" cty:"template" hcl:"template"`
+	TemplateName        *string `mapstructure:"template_name" cty:"template_name" hcl:"template_name"`
+	TemplateDescription *string `mapstructure:"template_description" cty:"template_description" hcl:"template_description"`
 
-	NetworkAdapters []FlatNetworkAdapterConfig `mapstructure:"network_adapters" cty:"network_adapters" hcl:"network_adapters"`
-	LXCConfig       map[string]interface{}     `mapstructure:"lxc_config" cty:"lxc_config" hcl:"lxc_config"`
+	NetworkAdapters   []FlatNetworkAdapterConfig `mapstructure:"network_adapters" cty:"network_adapters" hcl:"network_adapters"`
+	ContainerPassword *string                    `mapstructure:"container_password" cty:"container_password" hcl:"container_password"`
+	LXCConfig         map[string]interface{}     `mapstructure:"lxc_config" cty:"lxc_config" hcl:"lxc_config"`
 
 	Type        *string `mapstructure:"communicator" cty:"communicator" hcl:"communicator"`
 	SSHHost     *string `mapstructure:"ssh_host" cty:"ssh_host" hcl:"ssh_host"`
@@ -94,7 +99,12 @@ func (*FlatConfig) HCL2Spec() map[string]hcldec.Spec {
 		"nameserver":               &hcldec.AttrSpec{Name: "nameserver", Type: cty.String, Required: false},
 		"searchdomain":             &hcldec.AttrSpec{Name: "searchdomain", Type: cty.String, Required: false},
 		"unprivileged":             &hcldec.AttrSpec{Name: "unprivileged", Type: cty.Bool, Required: false},
+		"features":                 &hcldec.AttrSpec{Name: "features", Type: cty.String, Required: false},
+		"template":                 &hcldec.AttrSpec{Name: "template", Type: cty.Bool, Required: false},
+		"template_name":            &hcldec.AttrSpec{Name: "template_name", Type: cty.String, Required: false},
+		"template_description":     &hcldec.AttrSpec{Name: "template_description", Type: cty.String, Required: false},
 		"network_adapters":         &hcldec.BlockListSpec{TypeName: "network_adapters", Nested: hcldec.ObjectSpec((*FlatNetworkAdapterConfig)(nil).HCL2Spec())},
+		"container_password":       &hcldec.AttrSpec{Name: "container_password", Type: cty.String, Required: false},
 		"lxc_config":               &hcldec.AttrSpec{Name: "lxc_config", Type: cty.Map(cty.DynamicPseudoType), Required: false},
 		"communicator":             &hcldec.AttrSpec{Name: "communicator", Type: cty.String, Required: false},
 		"ssh_host":                 &hcldec.AttrSpec{Name: "ssh_host", Type: cty.String, Required: false},

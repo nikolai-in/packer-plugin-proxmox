@@ -37,19 +37,25 @@ type Config struct {
 	VMName string `mapstructure:"vm_name"`
 	VMID   int    `mapstructure:"vm_id"`
 
-	Ostemplate   string `mapstructure:"ostemplate"`
-	RootFS       string `mapstructure:"rootfs"`
-	Memory       int    `mapstructure:"memory"`
-	Cores        int    `mapstructure:"cores"`
-	Onboot       bool   `mapstructure:"onboot"`
-	Start        bool   `mapstructure:"start"`
-	Tags         string `mapstructure:"tags"`
-	Nameserver   string `mapstructure:"nameserver"`
-	SearchDomain string `mapstructure:"searchdomain"`
-	Unprivileged bool   `mapstructure:"unprivileged"`
+	Ostemplate          string `mapstructure:"ostemplate"`
+	RootFS              string `mapstructure:"rootfs"`
+	Memory              int    `mapstructure:"memory"`
+	Cores               int    `mapstructure:"cores"`
+	Onboot              bool   `mapstructure:"onboot"`
+	Start               bool   `mapstructure:"start"`
+	Tags                string `mapstructure:"tags"`
+	Nameserver          string `mapstructure:"nameserver"`
+	SearchDomain        string `mapstructure:"searchdomain"`
+	Unprivileged        bool   `mapstructure:"unprivileged"`
+	Features            string `mapstructure:"features"`
+	Template            bool   `mapstructure:"template"`
+	TemplateName        string `mapstructure:"template_name"`
+	TemplateDescription string `mapstructure:"template_description"`
+	DeleteAfterBuild    bool   `mapstructure:"delete_after_build"`
 
-	NetworkAdapters []NetworkAdapterConfig `mapstructure:"network_adapters"`
-	LXCConfig       map[string]interface{} `mapstructure:"lxc_config"`
+	NetworkAdapters   []NetworkAdapterConfig `mapstructure:"network_adapters"`
+	ContainerPassword string                 `mapstructure:"container_password"`
+	LXCConfig         map[string]interface{} `mapstructure:"lxc_config"`
 
 	Type        string        `mapstructure:"communicator"`
 	SSHHost     string        `mapstructure:"ssh_host"`
@@ -90,10 +96,8 @@ func (c *Config) Prepare(raws ...interface{}) ([]string, []string, error) {
 	var errs *packersdk.MultiError
 
 	packersdk.LogSecretFilter.Set(c.Password)
-	if passwordValue, ok := c.LXCConfig["password"]; ok {
-		if password, ok := passwordValue.(string); ok {
-			packersdk.LogSecretFilter.Set(password)
-		}
+	if c.ContainerPassword != "" {
+		packersdk.LogSecretFilter.Set(c.ContainerPassword)
 	}
 
 	if c.ProxmoxURLRaw == "" {
@@ -113,6 +117,17 @@ func (c *Config) Prepare(raws ...interface{}) ([]string, []string, error) {
 	}
 	if c.VMName == "" {
 		c.VMName = fmt.Sprintf("packer-%s", uuid.TimeOrderedUUID())
+	}
+	if c.TemplateName != "" {
+		c.VMName = c.TemplateName
+	}
+	if c.Template && c.TemplateDescription == "" {
+		c.TemplateDescription = fmt.Sprintf("Packer LXC template %s", c.VMName)
+	}
+	if c.Template {
+		c.DeleteAfterBuild = false
+	} else if !c.DeleteAfterBuild {
+		c.DeleteAfterBuild = true
 	}
 	if c.Memory < 1 {
 		c.Memory = 512
@@ -159,6 +174,13 @@ func (c *Config) createAPIParams(vmid int) map[string]interface{} {
 		"start":        c.Start,
 		"unprivileged": c.Unprivileged,
 	}
+	if c.Features != "" {
+		params["features"] = c.Features
+	}
+
+	if c.ContainerPassword != "" {
+		params["password"] = c.ContainerPassword
+	}
 
 	if c.Pool != "" {
 		params["pool"] = c.Pool
@@ -178,7 +200,6 @@ func (c *Config) createAPIParams(vmid int) map[string]interface{} {
 	for idx, nic := range c.NetworkAdapters {
 		params[fmt.Sprintf("net%d", idx)] = nic.apiParam(idx)
 	}
-
 	for key, value := range c.LXCConfig {
 		params[key] = value
 	}
